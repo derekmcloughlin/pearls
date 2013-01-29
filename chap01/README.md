@@ -1,7 +1,5 @@
-Chapter 1
-======
-
-Smallest Free Number
+Chapter 1 - The smallest free number
+====================================
 
 A naïve array-based solution
 ----------------------------
