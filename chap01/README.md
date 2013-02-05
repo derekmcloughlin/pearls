@@ -274,6 +274,68 @@ This code is in chap01f.hs
     ghci> minfree a
     15
 
+A Divide & Conquer Solution
+---------------------------
+
+A more generic version of `minfree` is `minfrom`:
+
+    minfree :: [Integer] -> Integer
+    minfree xs = minfrom 0 xs
+
+    minfrom :: Integer -> [Integer] -> Integer
+    minfrom a xs = head ([a ..] \\ xs)
+
+    (\\) :: Eq a => [a] -> [a] -> [a]
+    us \\ vs = filter (notElem' vs) us
+
+    notElem' :: Eq a => [a] -> a -> Bool
+    notElem' a n = notElem n a
+
+The code is in chap01g.hs.
+
+    ghci> :l chap01g.hs 
+    ghci> let a = [08, 23, 09, 00, 12, 11, 01, 10, 13, 07, 41, 04, 14, 21, 05, 17, 03, 19, 02, 06]
+    ghci> minfree a
+    15
+    ghci> minfrom 3 a
+    15
+    ghci> minfrom 17 a
+    18
+
+
+The heart of the divide and conquer solution is the use of the `partition` function in Haskell:
+
+    ghci> import Data.List
+    ghci> let a = [08, 23, 09, 00, 12, 11, 01, 10, 13, 07, 41, 04, 14, 21, 05, 17, 03, 19, 02, 06]
+    ghci> partition (<= 10) a
+    ([8,9,0,1,10,7,4,5,3,2,6],[23,12,11,13,41,14,21,17,19])
+
+With this, we have the divide and conquer solution:
+
+
+    import Data.List
+
+    minfree :: [Integer] -> Integer
+
+    minfree xs = minfrom 0 (toInteger (length xs), xs)
+
+    minfrom :: Integer -> (Integer, [Integer]) -> Integer
+
+    minfrom a (n, xs)   | n == 0        = a
+                        | m == b - a    = minfrom b (n - m, vs)
+                        | otherwise     = minfrom a (m, us)
+                          where (us, vs)    = partition (< b) xs
+                                b           = a + 1 + n `div` 2
+                                m           = toInteger (length us)
+
+
+The code for this can be found in chapt01h.hs. I've gone back to using Integers again.
+
+    ghci> :l chap01h.hs
+    ghci> let a = [08, 23, 09, 00, 12, 11, 01, 10, 13, 07, 41, 04, 14, 21, 05, 17, 03, 19, 02, 06]
+    ghci> minfree a
+    15
+
 References
 ----------
 
