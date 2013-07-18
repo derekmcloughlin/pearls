@@ -36,14 +36,38 @@ invert_c :: (Enum a, Eq a, Num a) => (a -> a -> a) -> a -> [(a, a)]
 invert_c f z = find (0, z) f z
 
 -- And more efficiently
-find' :: (Ord t, Enum t, Eq t, Num t) => (t, t) -> (t -> t -> t) -> t -> [(t, t)]
-find' (u, v) f z
+find_d :: (Ord t, Enum t, Eq t, Num t) => (t, t) -> (t -> t -> t) -> t -> [(t, t)]
+find_d (u, v) f z
     | u > z || v < 0   = []
-    | z' < z           = find' (u + 1, v) f z
-    | z' == z          = (u, v) : find' (u + 1, v - 1) f z
-    | z' > z           = find' (u, v - 1) f z
+    | z' < z           = find_d (u + 1, v) f z
+    | z' == z          = (u, v) : find_d (u + 1, v - 1) f z
+    | z' > z           = find_d (u, v - 1) f z
     where z' = f u v
 
 invert_d :: (Enum a, Eq a, Num a) => (a -> a -> a) -> a -> [(a, a)]
 invert_d f z = find (0, z) f z
 
+-- Final version
+bsearch :: (Ord a, Eq a, Integral a) => (a -> a) -> (a, a) -> a -> a
+bsearch g (a, b) z
+    | a + 1 == b    = a
+    | g m <= z      = bsearch g (m, b) z
+    | otherwise     = bsearch g (a, m) z
+    where m = (a + b) `div` 2
+
+find_e (u, v) (r, s) f z
+    | u > r || v < s    = []
+    | v - s <= r - u    = rfind (bsearch (\x -> f x q) (u - 1, r + 1) z)
+    | otherwise         = cfind (bsearch (\y -> f p y) (s - 1, v + 1) z)
+    where p = (u + r) `div` 2
+          q = (v + s) `div` 2
+          rfind p = (if f p q == z then (p, q) : find_e (u, v) (p-1, q+1) f z
+                        else find_e (u, v) (p, q+1) f z) ++
+                    find_e (p+1, q-1) (r , s) f z
+          cfind q = find_e (u, v) (p-1, q+1) f z ++
+                    (if f p q == z then(p, q) : find_e (p+1, q-1) (r , s) f z
+                        else find_e (p+1, q) (r , s) f z)
+
+invert_e f z = find_e (0, m) (n, 0) f z
+    where m = bsearch (\y -> f 0 y) (-1, z + 1) z
+          n = bsearch (\x -> f x 0) (-1, z + 1) z

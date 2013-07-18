@@ -111,6 +111,37 @@ Now we find a more efficient version of find:
     ghci> invert_d f2 219
     [(7,6),(43,3),(73,0)]
 
+Final Version
+-------------
+
+    bsearch :: (Ord a, Eq a, Integral a) => (a -> a) -> (a, a) -> a -> a
+    bsearch g (a, b) z
+        | a + 1 == b    = a
+        | g m <= z      = bsearch g (m, b) z
+        | otherwise     = bsearch g (a, m) z
+        where m = (a + b) `div` 2
+
+    find_e (u, v) (r, s) f z
+        | u > r || v < s    = []
+        | v - s <= r - u    = rfind (bsearch (\x -> f x q) (u - 1, r + 1) z)
+        | otherwise         = cfind (bsearch (\y -> f p y) (s - 1, v + 1) z)
+        where p = (u + r) `div` 2
+              q = (v + s) `div` 2
+              rfind p = (if f p q == z then (p, q) : find_e (u, v) (p-1, q+1) f z
+                            else find_e (u, v) (p, q+1) f z) ++
+                        find_e (p+1, q-1) (r , s) f z
+              cfind q = find_e (u, v) (p-1, q+1) f z ++
+                        (if f p q == z then(p, q) : find_e (p+1, q-1) (r , s) f z
+                            else find_e (p+1, q) (r , s) f z)
+
+    invert_e f z = find_e (0, m) (n, 0) f z
+        where m = bsearch (\y -> f 0 y) (-1, z + 1) z
+              n = bsearch (\x -> f x 0) (-1, z + 1) z
+
+    ghci> invert_e f1 10
+    [(5,5),(2,8),(1,9),(0,10),(4,6),(3,7),(8,2),(7,3),(6,4),(10,0),(9,1)]
+    ghci> invert_e f2 219
+    [(43,3),(7,6),(73,0)]
 
 References
 ----------
