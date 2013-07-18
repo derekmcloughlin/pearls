@@ -111,3 +111,8 @@ Now we find a more efficient version of find:
     ghci> invert_d f2 219
     [(7,6),(43,3),(73,0)]
 
+
+References
+----------
+The name saddleback search was given by [David Gries](http://www.cs.geneseo.edu/~baldwin/math-thinking/saddleback.html)
+
