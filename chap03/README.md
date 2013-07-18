@@ -9,13 +9,13 @@ monotonically increasing function along both the X and Y axes.
 
 For example, the function f x y = x + y produces:
 
-     X 0 1 2 3 4
-    Y  
-    0  0 1 2 3 4
-    1  1 2 3 4 5
-    2  2 3 4 5 6
-    3  3 4 5 6 7
     4  4 5 6 7 8
+    3  3 4 5 6 7
+    2  2 3 4 5 6
+    1  1 2 3 4 5
+    0  0 1 2 3 4
+    Y  
+     X 0 1 2 3 4
 
 The lowest value is always in one corner and the higest value in the opposite corner.
 
@@ -35,7 +35,6 @@ For testing purposes we define some useful functions:
     format2DArray [] = ""
     format2DArray (x:xs) = formatArray x ++ "\n" ++ format2DArray xs
 
-
     -- In this function, all values from 0..z are represented   
     f1 :: Num a => a -> a -> a
     f1 x y = x + y
@@ -47,8 +46,10 @@ For testing purposes we define some useful functions:
 Jack's first stab
 ----------------
 
+The brute-force approach:
+
     invert :: (Enum a, Eq a, Num a) => (a -> a -> a) -> a -> [(a, a)]
-    invert f z = [(x, y) | x <- [0..z ], y <- [0..z ], f x  y == z ]
+    invert f z = [(x, y) | x <- [0..z ], y <- [0..z ], f x y == z ]
     
     ghci> invert f1 10
     [(0,10),(1,9),(2,8),(3,7),(4,6),(5,5),(6,4),(7,3),(8,2),(9,1),(10,0)]
@@ -61,4 +62,52 @@ Code is in chap03a.hs.
 Theo's improvement
 ----------------
 
-    invert' f z = [(x, y) | x <- [0..z], y <- [0..z - x], f x, y == z ]
+Only look for items below the diagonal:
+
+    invert_b :: (Enum a, Eq a, Num a) => (a -> a -> a) -> a -> [(a, a)]
+    invert_b f z = [(x, y) | x <- [0..z], y <- [0..z - x], f x y == z ]
+
+    ghci> invert_b f1 10
+    [(0,10),(1,9),(2,8),(3,7),(4,6),(5,5),(6,4),(7,3),(8,2),(9,1),(10,0)]
+
+    ghci> invert_b f2 219
+    [(7,6),(43,3),(73,0)]
+
+
+Anne reduces it further
+-----------------------
+
+Firstly, redefine the way the search is done:
+
+    find :: (Enum t, Eq t, Num t) => (t, t) -> (t -> t -> t) -> t -> [(t, t)]
+    find (u, v) f z = [(x, y) | x <- [u .. z ], y <- [v, v - 1..0], f x y == z]
+
+    invert_c :: (Enum a, Eq a, Num a) => (a -> a -> a) -> a -> [(a, a)]
+    invert_c f z = find (0, z) f z
+    
+    ghci> invert_c f1 10
+    [(0,10),(1,9),(2,8),(3,7),(4,6),(5,5),(6,4),(7,3),(8,2),(9,1),(10,0)]
+
+    ghci> invert_c f2 219
+    [(7,6),(43,3),(73,0)]
+
+
+Now we find a more efficient version of find:
+
+    find' :: (Ord t, Enum t, Eq t, Num t) => (t, t) -> (t -> t -> t) -> t -> [(t, t)]
+    find' (u, v) f z
+        | u > z || v < 0   = []
+        | z' < z           = find' (u + 1, v) f z
+        | z' == z          = (u, v) : find' (u + 1, v - 1) f z
+        | z' > z           = find' (u, v - 1) f z
+        where z' = f u v
+
+    invert_d :: (Enum a, Eq a, Num a) => (a -> a -> a) -> a -> [(a, a)]
+    invert_d f z = find (0, z) f z
+
+    ghci> invert_d f1 10
+    [(0,10),(1,9),(2,8),(3,7),(4,6),(5,5),(6,4),(7,3),(8,2),(9,1),(10,0)]
+
+    ghci> invert_d f2 219
+    [(7,6),(43,3),(73,0)]
+
