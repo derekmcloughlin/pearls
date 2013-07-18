@@ -61,13 +61,15 @@ find_e (u, v) (r, s) f z
     | otherwise         = cfind (bsearch (\y -> f p y) (s - 1, v + 1) z)
     where p = (u + r) `div` 2
           q = (v + s) `div` 2
-          rfind p = (if f p q == z then (p, q) : find_e (u, v) (p-1, q+1) f z
-                        else find_e (u, v) (p, q+1) f z) ++
-                    find_e (p+1, q-1) (r , s) f z
-          cfind q = find_e (u, v) (p-1, q+1) f z ++
-                    (if f p q == z then(p, q) : find_e (p+1, q-1) (r , s) f z
-                        else find_e (p+1, q) (r , s) f z)
+          rfind p = (if f p q == z then (p, q) : find_e (u, v) (p - 1, q + 1) f z
+                        else find_e (u, v) (p, q + 1) f z) ++
+                    find_e (p + 1, q - 1) (r , s) f z
+          cfind q = find_e (u, v) (p - 1, q + 1) f z ++
+                    (if f p q == z then(p, q) : find_e (p + 1, q - 1) (r , s) f z
+                        else find_e (p + 1, q) (r , s) f z)
 
 invert_e f z = find_e (0, m) (n, 0) f z
     where m = bsearch (\y -> f 0 y) (-1, z + 1) z
           n = bsearch (\x -> f x 0) (-1, z + 1) z
+
+

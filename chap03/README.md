@@ -143,6 +143,13 @@ Final Version
     ghci> invert_e f2 219
     [(43,3),(7,6),(73,0)]
 
+    -- Note that the ordering of the results is different.
+
+Testing
+-------
+
+How do we go about testing the performance?
+
 References
 ----------
 The name saddleback search was given by [David Gries](http://www.cs.geneseo.edu/~baldwin/math-thinking/saddleback.html)
