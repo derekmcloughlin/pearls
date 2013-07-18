@@ -40,7 +40,7 @@ For testing purposes we define some useful functions:
     f1 :: Num a => a -> a -> a
     f1 x y = x + y
 
-    -- In this function, each value is represented only once.
+    -- In this function, z may not be represented at all
     f2 :: Num a => a -> a -> a
     f2 x y = 3*x + 27*y + y*y
 
