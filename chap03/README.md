@@ -53,6 +53,7 @@ Jack's first stab
 
 The brute-force approach:
 
+```haskell
     invert :: (Enum a, Eq a, Num a) => (a -> a -> a) -> a -> [(a, a)]
     invert f z = [(x, y) | x <- [0..z ], y <- [0..z ], f x y == z ]
     
@@ -61,6 +62,7 @@ The brute-force approach:
 
     ghci> invert f2 219
     [(7,6),(43,3),(73,0)]
+```
 
 Code is in chap03a.hs.    
 
@@ -69,6 +71,7 @@ Theo's improvement
 
 Only look for items below the diagonal:
 
+```haskell
     invert_b :: (Enum a, Eq a, Num a) => (a -> a -> a) -> a -> [(a, a)]
     invert_b f z = [(x, y) | x <- [0..z], y <- [0..z - x], f x y == z ]
 
@@ -77,13 +80,14 @@ Only look for items below the diagonal:
 
     ghci> invert_b f2 219
     [(7,6),(43,3),(73,0)]
-
+```
 
 Anne reduces it further
 -----------------------
 
 Firstly, redefine the way the search is done:
 
+```haskell
     find :: (Enum t, Eq t, Num t) => (t, t) -> (t -> t -> t) -> t -> [(t, t)]
     find (u, v) f z = [(x, y) | x <- [u .. z ], y <- [v, v - 1..0], f x y == z]
 
@@ -95,10 +99,11 @@ Firstly, redefine the way the search is done:
 
     ghci> invert_c f2 219
     [(7,6),(43,3),(73,0)]
-
+```
 
 Now we find a more efficient version of find:
 
+```haskell
     find_d :: (Ord t, Enum t, Eq t, Num t) => (t, t) -> (t -> t -> t) -> t -> [(t, t)]
     find_d (u, v) f z
         | u > z || v < 0   = []
@@ -115,6 +120,7 @@ Now we find a more efficient version of find:
 
     ghci> invert_d f2 219
     [(7,6),(43,3),(73,0)]
+```
 
 A Quick Note on Typeclasses
 ---------------------------
@@ -127,13 +133,16 @@ properties we need, so let's use it.
 
 The type signature for `find_d` can be changed to:
 
+```haskell
     find_d :: (Integral) => (t, t) -> (t -> t -> t) -> t -> [(t, t)]
+```
 
 Changes with cleaned-up type sigs in chapt3b.hs.    
 
 Theo's improvement 
 ------------------
 
+```haskell
     bsearch :: (Integral a) => (a -> a) -> (a, a) -> a -> a
     bsearch g (a, b) z
         | a + 1 == b    = a
@@ -153,12 +162,14 @@ Theo's improvement
     invert_e :: (Integral a) => (a -> a -> a) -> a -> [(a, a)]
     invert_e f z = find_e (0, m) f z
         where m = bsearch (\y -> f 0 y) (-1, z + 1) z
+```
 
 Code in chap03c.hs.
 
 Final Version
 -------------
 
+```haskell
     bsearch :: (Integral a) => (a -> a) -> (a, a) -> a -> a
     bsearch g (a, b) z
         | a + 1 == b    = a
@@ -191,6 +202,7 @@ Final Version
     [(43,3),(7,6),(73,0)]
 
     -- Note that the ordering of the results is different.
+```
 
 Code in chap03d.hs.
 
@@ -203,17 +215,21 @@ We're mostly interested in the number of times the function f has been called. T
 test functions given as examples in the book. I added a sixth which just adds x and y, which is
 useful for testing, since all values 0..z are present in the result set.
 
+```haskell
     f0 x y = 2^y*(2*x + 1) - 1
     f1 x y = x*2^x + y*2^y + 2*x + y
     f2 x y = 3*x + 27*y + y*y
     f3 x y = x*x + y*y + x + y
     f4 x y = x + 2^y + y - 1
     f5 x y = x + y
+```
 
 There's no point testing performance in ghci so we'll have to compile a proper program
 using ghc. First we'll need a `main` function.
 
+```haskell
     main = putStrLn $ show $ invert f0 100
+```
 
 Next we'll compile with some flags to enable profiling output.
 
@@ -272,6 +288,7 @@ from the command line:
 
 The changes are:
 
+```haskell
     methodDispatch :: [(String,  (Integer -> Integer -> Integer) -> Integer -> [(Integer, Integer)])]
     methodDispatch = [ ("A", invert_a),
                  ("B", invert_b),
@@ -296,7 +313,7 @@ The changes are:
         let (Just action) = lookup command commandDispatch  
         let (Just invert_method) = lookup method methodDispatch  
         putStrLn $ show $ invert_method action number
-
+```
 
 Code is in chap03e.hs.
 
