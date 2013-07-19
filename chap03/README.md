@@ -21,6 +21,7 @@ The lowest value is always in one corner and the higest value in the opposite co
 
 For testing purposes we define some useful functions:
 
+```haskell
     -- Make a 2-D array of size z given a function f
     mkArray :: (Enum a, Num a) => (a -> a -> a) -> a -> [[a]]
     mkArray f z = [ [f x y | x <- [0..z]] | y <- [0..z]]
@@ -42,6 +43,7 @@ For testing purposes we define some useful functions:
     -- In this function, z may not be represented at all
     f2 :: Num a => a -> a -> a
     f2 x y = 3*x + 27*y + y*y
+```
 
 **Note**: The original code in chapter 3 uses a function that takes a pair of 
 integers. I've modified it to just accept two integer arguments instead.
