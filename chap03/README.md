@@ -103,7 +103,7 @@ Now we find a more efficient version of find:
         where z' = f u v
 
     invert_d :: (Enum a, Eq a, Num a) => (a -> a -> a) -> a -> [(a, a)]
-    invert_d f z = find (0, z) f z
+    invert_d f z = find_d (0, z) f z
 
     ghci> invert_d f1 10
     [(0,10),(1,9),(2,8),(3,7),(4,6),(5,5),(6,4),(7,3),(8,2),(9,1),(10,0)]
