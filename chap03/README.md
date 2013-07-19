@@ -161,28 +161,28 @@ Final Version
         | otherwise     = bsearch g (a, m) z
         where m = (a + b) `div` 2
 
-    find_e :: (Integral a) => (a, a) -> (a, a) -> (a -> a -> a) -> a -> [(a, a)]
-    find_e (u, v) (r, s) f z
+    find_f :: (Integral a) => (a, a) -> (a, a) -> (a -> a -> a) -> a -> [(a, a)]
+    find_f (u, v) (r, s) f z
         | u > r || v < s    = []
         | v - s <= r - u    = rfind (bsearch (\x -> f x q) (u - 1, r + 1) z)
         | otherwise         = cfind (bsearch (\y -> f p y) (s - 1, v + 1) z)
         where p = (u + r) `div` 2
               q = (v + s) `div` 2
-              rfind p = (if f p q == z then (p, q) : find_e (u, v) (p-1, q+1) f z
-                            else find_e (u, v) (p, q+1) f z) ++
-                        find_e (p+1, q-1) (r , s) f z
-              cfind q = find_e (u, v) (p-1, q+1) f z ++
-                        (if f p q == z then(p, q) : find_e (p+1, q-1) (r , s) f z
-                            else find_e (p+1, q) (r , s) f z)
+              rfind p = (if f p q == z then (p, q) : find_f (u, v) (p-1, q+1) f z
+                            else find_f (u, v) (p, q+1) f z) ++
+                        find_f (p+1, q-1) (r , s) f z
+              cfind q = find_f (u, v) (p-1, q+1) f z ++
+                        (if f p q == z then(p, q) : find_f (p+1, q-1) (r , s) f z
+                            else find_f (p+1, q) (r , s) f z)
 
-    invert_e :: (Integral a) => (a -> a -> a) -> a -> [(a, a)]
-    invert_e f z = find_e (0, m) (n, 0) f z
+    invert_f :: (Integral a) => (a -> a -> a) -> a -> [(a, a)]
+    invert_f f z = find_f (0, m) (n, 0) f z
         where m = bsearch (\y -> f 0 y) (-1, z + 1) z
               n = bsearch (\x -> f x 0) (-1, z + 1) z
 
-    ghci> invert_e f1 10
+    ghci> invert_f f1 10
     [(5,5),(2,8),(1,9),(0,10),(4,6),(3,7),(8,2),(7,3),(6,4),(10,0),(9,1)]
-    ghci> invert_e f2 219
+    ghci> invert_f f2 219
     [(43,3),(7,6),(73,0)]
 
     -- Note that the ordering of the results is different.
