@@ -94,12 +94,12 @@ Firstly, redefine the way the search is done:
 
 Now we find a more efficient version of find:
 
-    find' :: (Ord t, Enum t, Eq t, Num t) => (t, t) -> (t -> t -> t) -> t -> [(t, t)]
-    find' (u, v) f z
+    find_d :: (Ord t, Enum t, Eq t, Num t) => (t, t) -> (t -> t -> t) -> t -> [(t, t)]
+    find_d (u, v) f z
         | u > z || v < 0   = []
-        | z' < z           = find' (u + 1, v) f z
-        | z' == z          = (u, v) : find' (u + 1, v - 1) f z
-        | z' > z           = find' (u, v - 1) f z
+        | z' < z           = find_d (u + 1, v) f z
+        | z' == z          = (u, v) : find_d (u + 1, v - 1) f z
+        | z' > z           = find_d (u, v - 1) f z
         where z' = f u v
 
     invert_d :: (Enum a, Eq a, Num a) => (a -> a -> a) -> a -> [(a, a)]
@@ -111,16 +111,32 @@ Now we find a more efficient version of find:
     ghci> invert_d f2 219
     [(7,6),(43,3),(73,0)]
 
+A Quick Note on Typeclasses
+---------------------------
+Some of the typeclasses used in the signatures are a bit messy - I just kept adding in extra
+ones when the compiler complained about something.
+
+However, typeclasses have a [hierarchy]( http://blogs.msdn.com/b/saeed/archive/2009/03/14/haskell-class-hierarchy-diagram.aspx), and 
+looking at the hierarchy diagram you see that being a `Num` implies being an `Eq`. An `Integral` has all the
+properties we need, so let's use it.
+
+The type signature for `find_d` can be changed to:
+
+    find_d :: (Integral) => (t, t) -> (t -> t -> t) -> t -> [(t, t)]
+
+Changes with cleaned-up type sigs in chapt3b.hs.    
+
 Final Version
 -------------
 
-    bsearch :: (Ord a, Eq a, Integral a) => (a -> a) -> (a, a) -> a -> a
+    bsearch :: (Integral a) => (a -> a) -> (a, a) -> a -> a
     bsearch g (a, b) z
         | a + 1 == b    = a
         | g m <= z      = bsearch g (m, b) z
         | otherwise     = bsearch g (a, m) z
         where m = (a + b) `div` 2
 
+    find_e :: (Integral a) => (a, a) -> (a, a) -> (a -> a -> a) -> a -> [(a, a)]
     find_e (u, v) (r, s) f z
         | u > r || v < s    = []
         | v - s <= r - u    = rfind (bsearch (\x -> f x q) (u - 1, r + 1) z)
@@ -134,6 +150,7 @@ Final Version
                         (if f p q == z then(p, q) : find_e (p+1, q-1) (r , s) f z
                             else find_e (p+1, q) (r , s) f z)
 
+    invert_e :: (Integral a) => (a -> a -> a) -> a -> [(a, a)]
     invert_e f z = find_e (0, m) (n, 0) f z
         where m = bsearch (\y -> f 0 y) (-1, z + 1) z
               n = bsearch (\x -> f x 0) (-1, z + 1) z
@@ -144,6 +161,8 @@ Final Version
     [(43,3),(7,6),(73,0)]
 
     -- Note that the ordering of the results is different.
+
+Code in chap03c.hs.
 
 Testing
 -------
