@@ -271,7 +271,7 @@ from the command line:
 The changes are:
 
     methodDispatch :: [(String,  (Integer -> Integer -> Integer) -> Integer -> [(Integer, Integer)])]
-    methodDispatch = [ ("A", invert),
+    methodDispatch = [ ("A", invert_a),
                  ("B", invert_b),
                  ("C", invert_c),
                  ("D", invert_d),
