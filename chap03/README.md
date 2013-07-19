@@ -126,6 +126,31 @@ The type signature for `find_d` can be changed to:
 
 Changes with cleaned-up type sigs in chapt3b.hs.    
 
+Theo's improvement 
+------------------
+
+    bsearch :: (Integral a) => (a -> a) -> (a, a) -> a -> a
+    bsearch g (a, b) z
+        | a + 1 == b    = a
+        | g m <= z      = bsearch g (m, b) z
+        | otherwise     = bsearch g (a, m) z
+        where m = (a + b) `div` 2
+
+    find_e :: (Integral a) => (a, a) -> (a -> a -> a) -> a -> [(a, a)]
+    find_e (u, v) f z
+        | u > n || n < 0   = []
+        | z' < z           = find_e (u + 1, v) f z
+        | z' == z          = (u, v) : find_e (u + 1, v - 1) f z
+        | z' > z           = find_e (u, v - 1) f z
+        where z' = f u v
+              n = maximum (filter (\x -> f x 0 <= z) [0 .. z ])
+
+    invert_e :: (Integral a) => (a -> a -> a) -> a -> [(a, a)]
+    invert_e f z = find_e (0, m) f z
+        where m = bsearch (\y -> f 0 y) (-1, z + 1) z
+
+Code in chap03c.hs.
+
 Final Version
 -------------
 
@@ -162,7 +187,7 @@ Final Version
 
     -- Note that the ordering of the results is different.
 
-Code in chap03c.hs.
+Code in chap03d.hs.
 
 Testing
 -------
