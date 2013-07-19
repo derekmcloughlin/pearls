@@ -43,6 +43,9 @@ For testing purposes we define some useful functions:
     f2 :: Num a => a -> a -> a
     f2 x y = 3*x + 27*y + y*y
 
+**Note**: The original code in chapter 3 uses a function that takes a pair of 
+integers. I've modified it to just accept two integer arguments instead.
+
 Jack's first stab
 ----------------
 
@@ -294,6 +297,8 @@ The changes are:
 
 
 Code is in chap03e.hs.
+
+**Note**: Some of my results don't agree with the figures in the book. Still investigating.
 
 References
 ----------
