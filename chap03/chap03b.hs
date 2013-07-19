@@ -1,3 +1,6 @@
+import Text.Printf
+import Control.Monad.State
+
 -- Make a 2-D array of size z given a function f
 mkArray :: (Enum a, Num a) => (a -> a -> a) -> a -> [[a]]
 mkArray f z = [ [f x y | x <- [0..z]] | y <- [0..z]]
@@ -11,14 +14,6 @@ formatArray (x:xs) = show x ++ "\t" ++ formatArray xs
 format2DArray :: (Show a, Num a) => [[a]] -> String
 format2DArray [] = ""
 format2DArray (x:xs) = formatArray x ++ "\n" ++ format2DArray xs
-
--- In this function, all values from 0..z are represented   
-f1 :: Num a => a -> a -> a
-f1 x y = x + y
-
--- In this function, each value is represented only once.
-f2 :: Num a => a -> a -> a
-f2 x y = 3*x + 27*y + y*y
 
 -- Jack's first solution
 invert :: (Enum a, Eq a, Num a) => (a -> a -> a) -> a -> [(a, a)]
@@ -55,7 +50,6 @@ bsearch g (a, b) z
     | otherwise     = bsearch g (a, m) z
     where m = (a + b) `div` 2
 
-find_e :: (Integral t, Ord t, Enum t, Eq t, Num t) => (t, t) -> (t, t) -> (t -> t -> t) -> t -> [(t, t)]
 find_e (u, v) (r, s) f z
     | u > r || v < s    = []
     | v - s <= r - u    = rfind (bsearch (\x -> f x q) (u - 1, r + 1) z)
@@ -69,9 +63,26 @@ find_e (u, v) (r, s) f z
                     (if f p q == z then(p, q) : find_e (p + 1, q - 1) (r , s) f z
                         else find_e (p + 1, q) (r , s) f z)
 
-invert_e :: (Integral a, Enum a, Eq a, Num a) => (a -> a -> a) -> a -> [(a, a)]
 invert_e f z = find_e (0, m) (n, 0) f z
     where m = bsearch (\y -> f 0 y) (-1, z + 1) z
           n = bsearch (\x -> f x 0) (-1, z + 1) z
 
+
+-- Test Functions 
+
+
+f0 :: Integral a => a -> a -> a
+f0 x y = 2^y * (2 * x + 1) - 1
+
+f1 :: Integral a => a -> a -> a
+f1 x y = x*2^x + y*2^y + 2*x + y
+
+f2 :: Integral a => a -> a -> a
+f2 x y = 3*x + 27*y + y*y
+
+f3 :: Integral a => a -> a -> a
+f3 x y = x*x + y*y + x + y
+
+f4 :: Integral a => a -> a -> a
+f4 x y = x + 2^y + y - 1
 
