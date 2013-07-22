@@ -315,6 +315,14 @@ main = do
     putStrLn $ show $ invert_method action number
 ```
 
+You can run it like this:
+
+```
+C:> chap03e.exe A f0 5000 +RTS -p
+
+```
+
+
 Code is in chap03e.hs.
 
 **Note**: Some of my results don't agree with the figures in the book. Still investigating.
