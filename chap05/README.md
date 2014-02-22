@@ -100,11 +100,14 @@ gives us the following:
 
 ```haskell
 ghci> subs xs ys
-[(-19,(1,1)),(-29,(1,2)),(-39,(1,3)),(-49,(1,4)),(-59,(1,5)),(-17,(2,1)),(-27,(2,2)),(-37,(2,3)),(-47,(2,4)),(-57,(2,5)),(-15,(3,1)),(-25,(3,2)),(-35,(3,3)),(-45,(3,4)),(-55,(3,5)),(-13,(4,1)),(-23,(4,2)),(-33,(4,3)),(-43,(4,4)),(-53,(4,5)),(-11,(5,1)),(-21,(5,2)),(-31,(5,3)),(-41,(5,4)),(-51,(5,5))]
+[(-19,(1,1)),(-29,(1,2)),(-39,(1,3)),(-49,(1,4)),(-59,(1,5)),
+ (-17,(2,1)),(-27,(2,2)),(-37,(2,3)),(-47,(2,4)),(-57,(2,5)),
+ (-15,(3,1)),(-25,(3,2)),(-35,(3,3)),(-45,(3,4)),(-55,(3,5)),
+ (-13,(4,1)),(-23,(4,2)),(-33,(4,3)),(-43,(4,4)),(-53,(4,5)),
+ (-11,(5,1)),(-21,(5,2)),(-31,(5,3)),(-41,(5,4)),(-51,(5,5))]
 ```
 
 In tabular format this looks like:
-
 
 i/j | 1   | 2   | 3   | 4   | 5  
 --- | --- | --- | --- | --- | ---
@@ -114,13 +117,11 @@ i/j | 1   | 2   | 3   | 4   | 5
 4   | -13 | -23 | -33 | -43 | -53
 5   | -11 | -21 | -31 | -41 | -51
 
+We define `sortsubs` to sort this:
 
 ```haskell
 my_compare :: Ord a => Num a => (a, (Integer, Integer)) -> (a, (Integer, Integer)) -> Ordering
 my_compare x y = compare x y
-
-sortsums :: Ord a => Num a => [a] -> [a] -> [a]
-sortsums xs ys = map fst (sortsubs xs (map negate ys))
 
 sortsubs :: Ord a => Num a => [a] -> [a] -> [(a, (Integer, Integer))]
 sortsubs xs ys = sortBy my_compare (subs xs ys)
@@ -130,6 +131,37 @@ subs xs ys = [ (x - y, (i, j)) | (x, i) <- zip xs [1..], (y, j) <- zip ys [1..]]
 ```
 
 Note we changed `my_compare` to cater for the labels.
+
+
+Finally we define `sortsums` as follows:
+
+```haskell
+sortsums :: Ord a => Num a => [a] -> [a] -> [a]
+sortsums xs ys = map fst (sortsubs xs (map negate ys))
+```
+
+Here's what it looks like:
+
+```haskell
+ghci> map negate ys
+[-20,-30,-40,-50,-60]
+ghci> subs xs (map negate ys)
+[(21,(1,1)),(31,(1,2)),(41,(1,3)),(51,(1,4)),(61,(1,5)),
+ (23,(2,1)),(33,(2,2)),(43,(2,3)),(53,(2,4)),(63,(2,5)),
+ (25,(3,1)),(35,(3,2)),(45,(3,3)),(55,(3,4)),(65,(3,5)),
+ (27,(4,1)),(37,(4,2)),(47,(4,3)),(57,(4,4)),(67,(4,5)),
+ (29,(5,1)),(39,(5,2)),(49,(5,3)),(59,(5,4)),(69,(5,5))]
+
+ghci> sortsubs xs (map negate ys)
+[(21,(1,1)),(23,(2,1)),(25,(3,1)),(27,(4,1)),(29,(5,1)),
+ (31,(1,2)),(33,(2,2)),(35,(3,2)),(37,(4,2)),(39,(5,2)),
+ (41,(1,3)),(43,(2,3)),(45,(3,3)),(47,(4,3)),(49,(5,3)),
+ (51,(1,4)),(53,(2,4)),(55,(3,4)),(57,(4,4)),(59,(5,4)),
+ (61,(1,5)),(63,(2,5)),(65,(3,5)),(67,(4,5)),(69,(5,5))]
+
+ghci> map fst (sortsubs xs (map negate ys))
+[21,23,25,27,29,31,33,35,37,39,41,43,45,47,49,51,53,55,57,59,61,63,65,67,69]
+```
 
 Code is in chap05b.hs.
 
@@ -143,7 +175,7 @@ COST CENTRE   MODULE                  no.     entries  %time %alloc   %time %all
 The number of comparisons is the same as before, as expected.
 
 ```haskell
-ghci> :l chap05a.hs
+ghci> :l chap05b.hs
 ghci> let a = sortsums xs ys
 ghci> c
 [21,23,25,27,29,31,33,35,37,39,41,43,45,47,49,51,53,55,57,59,61,63,65,67,69]
