@@ -89,6 +89,32 @@ COST CENTRE   MODULE                  no.     entries  %time %alloc   %time %all
 First Attempt
 -------------
 
+The table of labelled subtractions
+
+```haskell
+subs :: Num a => [a] -> [a] -> [(a, (Integer, Integer))]
+subs xs ys = [ (x - y, (i, j)) | (x, i) <- zip xs [1..], (y, j) <- zip ys [1..]]
+```
+
+gives us the following:
+
+```haskell
+ghci> subs xs ys
+[(-19,(1,1)),(-29,(1,2)),(-39,(1,3)),(-49,(1,4)),(-59,(1,5)),(-17,(2,1)),(-27,(2,2)),(-37,(2,3)),(-47,(2,4)),(-57,(2,5)),(-15,(3,1)),(-25,(3,2)),(-35,(3,3)),(-45,(3,4)),(-55,(3,5)),(-13,(4,1)),(-23,(4,2)),(-33,(4,3)),(-43,(4,4)),(-53,(4,5)),(-11,(5,1)),(-21,(5,2)),(-31,(5,3)),(-41,(5,4)),(-51,(5,5))]
+```
+
+In tabular format this looks like:
+
+|  |   1|   2|   3|   4|   5|
+|--|----|----|----|----|----|
+|1 | -19| -29| -39| -49| -59|
+|2 | -17| -27| -37| -47| -57|
+|3 | -15| -25| -35| -45| -55|
+|4 | -13| -23| -33| -43| -53|
+|5 | -11| -21| -31| -41| -51|
+
+
+
 ```haskell
 my_compare :: Ord a => Num a => (a, (Integer, Integer)) -> (a, (Integer, Integer)) -> Ordering
 my_compare x y = compare x y
