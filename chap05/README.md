@@ -115,6 +115,12 @@ In tabular format this looks like:
 
 
 
+First Header  | Second Header
+------------- | -------------
+Content Cell  | Content Cell
+Content Cell  | Content Cell
+
+
 ```haskell
 my_compare :: Ord a => Num a => (a, (Integer, Integer)) -> (a, (Integer, Integer)) -> Ordering
 my_compare x y = compare x y
