@@ -148,7 +148,8 @@ Improving the Search
 First we use the 2nd version of the `expressions` function:
 
 ```haskell
-expressions = foldr extend [ ]
+expressions :: [Digit] -> [Expression] 
+expressions = foldr extend []
 
 extend :: Digit -> [Expression] -> [Expression] 
 extend x [] = [[[[x]]]]
@@ -162,6 +163,6 @@ glue x ((xs:xss):xsss) = [((x:xs):xss):xsss,
 
 Code in chap06b.hs. It gives the same results as the first version.
 
-
+Next 
 
 
