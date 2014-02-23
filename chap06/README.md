@@ -59,7 +59,7 @@ It's a bit difficult to see this, so reformatting:
 ]
 ```
 
-The approach to findind all ways to use the digits 1..9 to produce 100 evaluates
+The approach to find all ways to use the digits 1..9 to produce 100 evaluates
 all possible expressions in a brute-force way. Evaluating an expression goes down the
 tree from Expression to Term to Factor.
 
@@ -141,6 +141,26 @@ ghci> length $ goodOnes digits
 ```
 
 Code is in chap06a.hs
+
+Improving the Search
+--------------------
+
+First we use the 2nd version of the `expressions` function:
+
+```haskell
+expressions = foldr extend [ ]
+
+extend :: Digit -> [Expression] -> [Expression] 
+extend x [] = [[[[x]]]]
+extend x es = concatMap (glue x) es
+
+glue :: Digit -> Expression -> [Expression] 
+glue x ((xs:xss):xsss) = [((x:xs):xss):xsss,
+                          ([x] : xs : xss) : xsss, 
+                          [[x]] : (xs : xss) : xsss]
+```
+
+Code in chap06b.hs. It gives the same results as the first version.
 
 
 
