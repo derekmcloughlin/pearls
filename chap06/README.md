@@ -166,9 +166,6 @@ Code in chap06b.hs. It gives the same results as the first version.
 Next we have:
 
 ```haskell
-cross :: (a -> b, c -> d) -> (a, c) -> (b, d)
-cross (f, g) (x, y) = (f x, g y)
-
 good c (_, f, t, e)  = (f * t + e ==c)
 ok c (_, f, t, e)    = (f * t + e <= c)
 

@@ -9,9 +9,6 @@ digits = [1 .. 9]
 pi_digits :: Factor
 pi_digits = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5, 8, 9, 7]
 
-cross :: (a -> b, c -> d) -> (a, c) -> (b, d)
-cross (f, g) (x, y) = (f x, g y)
-
 good c (_, f, t, e)  = (f * t + e ==c)
 ok c (_, f, t, e)    = (f * t + e <= c)
 
