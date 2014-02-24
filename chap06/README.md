@@ -184,12 +184,14 @@ glue x ((xs : xss) : xsss, (k, f, t, e)) =
     [(((x : xs) : xss) : xsss, (10*k, k*x + f, t, e)),
     (([x] : xs : xss) : xsss, (10, x, f * t, e)),
     ([[x]] : (xs : xss) : xsss, (10, x, 1, f * t + e))]
-
 ```
 
 This replaces the evaluation code (valFact, valTerm, valExpr).
 
 Code in chap06c.hs.
+
+Note that the order of results produced by this solution is different from the order 
+produced by the first solution, but the results are the same (you can verify this by sorting the result first).
 
 Finally we can test the assertion that the new code is much faster, using 
 100 as the number and the first 14 digits of Pi:
