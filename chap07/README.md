@@ -184,4 +184,28 @@ ghci> trees [1, 2, 3, 4]
 Calculating the Minimum Cost
 ----------------------------
 
+```haskell
+minBy :: Ord b => (a -> b) -> [a] -> a
+minBy f = foldl1 (cmp f)
+
+cmp :: Ord b => (a -> b) -> a -> a -> a
+cmp f u v = if f u <= f v then u else v
+```
+
+Trying this out in ghci:
+
+```haskell
+ghci> minBy cost $ trees [1, 2, 3, 4, 5, 6]
+Fork 
+    (Fork 
+        (Fork 
+            (Fork 
+                (Fork (Leaf 1) (Leaf 2)) 
+                (Leaf 3)) 
+            (Leaf 4))
+        (Leaf 5)) 
+    (Leaf 6)
+```
+
+Code in chap07d.hs.
 
