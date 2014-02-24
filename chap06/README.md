@@ -163,6 +163,77 @@ glue x ((xs:xss):xsss) = [((x:xs):xss):xsss,
 
 Code in chap06b.hs. It gives the same results as the first version.
 
-Next 
+Next we have:
 
+```haskell
+cross :: (a -> b, c -> d) -> (a, c) -> (b, d)
+cross (f, g) (x, y) = (f x, g y)
 
+good c (_, f, t, e)  = (f * t + e ==c)
+ok c (_, f, t, e)    = (f * t + e <= c)
+
+modify x (k, f, t, e) = [(10 * k, k * x + f, t, e), (10, x, f * t, e), (10, x, 1, f * t + e)]
+
+solutions :: Int -> [Digit] -> [Expression]
+solutions c = map fst . filter (good c . snd) . foldr (expand c) []
+
+expand c x [] = [([[[x]]], (10, x, 1, 0))]
+expand c x evs = concat (map (filter (ok c . snd) . glue x) evs)
+
+glue x ((xs : xss) : xsss, (k, f, t, e)) =
+    [(((x : xs) : xss) : xsss, (10*k, k*x + f, t, e)),
+    (([x] : xs : xss) : xsss, (10, x, f * t, e)),
+    ([[x]] : (xs : xss) : xsss, (10, x, 1, f * t + e))]
+
+```
+
+This replaces the evaluation code (valFact, valTerm, valExpr).
+
+Code in chap06c.hs.
+
+Finally we can test the assertion that the new code is much faster, using 
+100 as the number and the first 14 digits of Pi:
+
+```haskell
+pi_digits :: Factor
+pi_digits = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5, 8, 9, 7]
+
+main = putStrLn $ "Number of solutions found: " ++ (show $ length $ solutions 1000 pi_digits)
+```
+
+We also put similar code in a modified version of our first solution:
+
+```haskell
+good v = v == 1000
+
+main = putStrLn $ "Number of solutions found: " ++ (show $ length $ goodOnes pi_digits)
+```
+
+Code in chap06a-1.hs.
+
+Not trusting performance testing directly in ghci, we compile both:
+
+```
+ghc -O2 -auto-all chap06a-1.hs
+ghc -O2 -auto-all chap06c.hs
+```
+
+Running using the standard `time` program:
+
+```
+$ time ./chap06a-1
+Number of solutions found: 202
+
+real    0m1.649s
+user    0m0.672s
+sys     0m0.976s
+
+$ time ./chap06c
+Number of solutions found: 202
+
+real    0m0.070s
+user    0m0.000s
+sys     0m0.068s
+```
+
+Yes, there's a huge difference.

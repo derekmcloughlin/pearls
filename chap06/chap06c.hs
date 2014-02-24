@@ -6,30 +6,26 @@ type Digit = Int
 digits :: Factor
 digits = [1 .. 9]
 
-valExpr :: Expression -> Int 
-valExpr = sum . map valTerm
+pi_digits :: Factor
+pi_digits = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5, 8, 9, 7]
 
-valTerm :: Term -> Int
-valTerm = product . map valFact 
+cross :: (a -> b, c -> d) -> (a, c) -> (b, d)
+cross (f, g) (x, y) = (f x, g y)
 
-valFact :: Factor -> Int
-valFact = foldl1 (\n d -> 10 * n + d)
+good c (_, f, t, e)  = (f * t + e ==c)
+ok c (_, f, t, e)    = (f * t + e <= c)
 
-expressions :: [Digit] -> [Expression] 
-expressions = foldr extend [ ]
+modify x (k, f, t, e) = [(10 * k, k * x + f, t, e), (10, x, f * t, e), (10, x, 1, f * t + e)]
 
-extend :: Digit -> [Expression] -> [Expression] 
-extend x [] = [[[[x]]]]
-extend x es = concatMap (glue x) es
+solutions :: Int -> [Digit] -> [Expression]
+solutions c = map fst . filter (good c . snd) . foldr (expand c) []
 
-glue :: Digit -> Expression -> [Expression] 
-glue x ((xs:xss):xsss) = [((x:xs):xss):xsss,
-                          ([x] : xs : xss) : xsss, 
-                          [[x]] : (xs : xss) : xsss]
+expand c x [] = [([[[x]]], (10, x, 1, 0))]
+expand c x evs = concat (map (filter (ok c . snd) . glue x) evs)
 
-good :: Int -> Bool
-good v = v == 100
+glue x ((xs : xss) : xsss, (k, f, t, e)) =
+    [(((x : xs) : xss) : xsss, (10*k, k*x + f, t, e)),
+    (([x] : xs : xss) : xsss, (10, x, f * t, e)),
+    ([[x]] : (xs : xss) : xsss, (10, x, 1, f * t + e))]
 
-goodOnes :: [Digit] -> [Expression]
-goodOnes = filter (good . valExpr) . expressions
-
+main = putStrLn $ "Number of solutions found: " ++ (show $ length $ solutions 1000 pi_digits)
