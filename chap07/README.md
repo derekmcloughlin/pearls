@@ -114,3 +114,74 @@ ghci> length $ trees [8, 2, 7, 9, 6, 3, 5]
 Code in chap07a.hs.
 
 
+Using a Fold Function
+---------------------
+
+By defining a fold function `foldrn` that can work on non-empty lists, we can re-write
+`trees`:
+
+```haskell
+foldrn :: (a -> b -> b) -> (a -> b) -> [a] -> b 
+foldrn f g [x]      = g x
+foldrn f g (x:xs)   = f x (foldrn f g xs)
+
+trees :: [Int] -> [Tree]
+trees = foldrn (concatMap . prefixes) (wrap . Leaf)
+wrap x = [x]
+```
+
+Code in chap07b.hs. You can check that the definitions produce the same results.
+
+
+Introducting Forests
+--------------------
+
+A forest is a list of trees:
+
+```haskell
+type Forest = [Tree]
+```
+
+We can redefine `trees` as follows:
+
+```haskell
+trees :: [Int] -> [Tree]
+trees = map rollup . forests
+
+forests :: [Int ] -> [Forest]
+forests = foldrn (concatMap . prefixes) (wrap . wrap . Leaf )
+
+wrap :: a -> [a]
+wrap x = [x]
+
+prefixes :: Int -> Forest -> [Forest ] 
+prefixes x ts = [Leaf x : rollup (take k ts) : drop k ts | k <- [1 .. length ts]]
+
+rollup :: Forest -> Tree 
+rollup = foldl1 Fork
+```
+
+Code in chap07c.hs. The definitions produce the same results, but in a different order 
+        
+```haskell
+ghci> :l chap07a.hs
+ghci> trees [1, 2, 3, 4]
+[Fork (Leaf 1) (Fork (Leaf 2) (Fork (Leaf 3) (Leaf 4))),
+ Fork (Fork (Leaf 1) (Leaf 2)) (Fork (Leaf 3) (Leaf 4)),
+ Fork (Leaf 1) (Fork (Fork (Leaf 2) (Leaf 3)) (Leaf 4)),
+ Fork (Fork (Leaf 1) (Fork (Leaf 2) (Leaf 3))) (Leaf 4),
+ Fork (Fork (Fork (Leaf 1) (Leaf 2)) (Leaf 3)) (Leaf 4)]
+
+ghci> :l chap07c.hs
+ghci> trees [1, 2, 3, 4]
+[Fork (Fork (Fork (Leaf 1) (Leaf 2)) (Leaf 3)) (Leaf 4),
+ Fork (Fork (Leaf 1) (Fork (Leaf 2) (Leaf 3))) (Leaf 4),
+ Fork (Leaf 1) (Fork (Fork (Leaf 2) (Leaf 3)) (Leaf 4)),
+ Fork (Fork (Leaf 1) (Leaf 2)) (Fork (Leaf 3) (Leaf 4)),
+ Fork (Leaf 1) (Fork (Leaf 2) (Fork (Leaf 3) (Leaf 4)))]
+ ```
+
+Calculating the Minimum Cost
+----------------------------
+
+
