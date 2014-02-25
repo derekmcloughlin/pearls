@@ -15,6 +15,32 @@ tree_2 = Fork
                 (Fork (Leaf 6) 
                     (Fork (Leaf 3) (Leaf 5))))
 
+tree_3 :: Tree
+tree_3 = Fork 
+            (Fork 
+                (Fork 
+                    (Leaf 1) 
+                    (Leaf 2)) 
+                (Leaf 3)) 
+            (Fork 
+                (Leaf 6) 
+                (Fork 
+                    (Leaf 5) (Leaf 4)))
+
+tree_4 :: Tree
+tree_4 = Fork 
+            (Fork 
+                (Fork 
+                    (Leaf 1) 
+                    (Fork 
+                        (Leaf 2) 
+                        (Fork 
+                            (Leaf 3) 
+                            (Leaf 6)))) 
+                (Leaf 5)) 
+            (Leaf 4)
+
+
 fringe :: Tree -> [Int]
 fringe (Leaf x) = [x]
 fringe (Fork u v) = fringe u ++ fringe v

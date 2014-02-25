@@ -56,7 +56,11 @@ tree_2 = Fork
                     (Fork (Leaf 3) (Leaf 5))))
 ```
 
-The fringe of a tree is the list of integers at the leaf: (note: this code isn't in the book)
+The fringe of a tree is the list of integers at the leaves, in
+left-to-right order. This last bit is important. A tree with a fringe
+of `[1, 2, 3, 4, 5, 6]` is different to one with a fringe of `[1, 2, 3, 6, 5, 4]`.
+
+Note: this code isn't in the book
 
 ```haskell
 fringe :: Tree -> [Int]
@@ -82,6 +86,44 @@ ghci> cost tree_1
 ghci> fringe tree_2
 [8,2,7,9,6,3,5]
 ghci> cost tree_2
+11
+```
+
+The following shows two trees with the same fringe but different costs:
+
+```haskell
+tree_3 :: Tree
+tree_3 = Fork 
+            (Fork 
+                (Fork 
+                    (Leaf 1) 
+                    (Leaf 2)) 
+                (Leaf 3)) 
+            (Fork 
+                (Leaf 6) 
+                (Fork 
+                    (Leaf 5) (Leaf 4)))
+
+tree_4 :: Tree
+tree_4 = Fork 
+            (Fork 
+                (Fork 
+                    (Leaf 1) 
+                    (Fork 
+                        (Leaf 2) 
+                        (Fork 
+                            (Leaf 3) 
+                            (Leaf 6)))) 
+                (Leaf 5)) 
+            (Leaf 4)
+
+ghci> fringe tree_3
+[1,2,3,6,5,4]
+ghci> fringe tree_4
+[1,2,3,6,5,4]
+ghci> cost tree_3
+8
+ghci> cost tree_4
 11
 ```
 
@@ -245,6 +287,8 @@ ghci> fmap cost $ trees [1, 2, 3, 4, 5, 6]
 ghci> fmap cost $ trees [1, 2, 3, 6, 5, 4]
 [9,9,10,10,10,10,11,11,11,10,11,11,10,11,9,9,10,10,10,11,11,10,11,9,9,10,10,11,8,8,9,9,9,10,10,9,10,8,8,9,9,10]
 ```
+
+This goes back to the fact that trees with different fringes are different trees.
 
 Also for the 2nd example there are 4 trees that have minimum cost:
 
