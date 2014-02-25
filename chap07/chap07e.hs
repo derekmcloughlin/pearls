@@ -51,7 +51,7 @@ cmp :: Ord b => (a -> b) -> a -> a -> a
 cmp f u v = if f u <= f v then u else v
 
 mincostTree :: [Int] -> Tree
-mincostTree = foldl1 Fork . map snd . foldrn insert (wrap . leaf )
+mincostTree = foldl1 Fork . map snd . foldrn insert (wrap . leaf)
 
 insert :: Int -> [(Int, Tree)] -> [(Int, Tree)]
 insert x ts = leaf x : split x ts
@@ -66,4 +66,5 @@ leaf x = (x , Leaf x )
 
 fork :: (Int, Tree) -> (Int, Tree) -> (Int, Tree)
 fork (a, u) (b, v) = (1 + a `max` b, Fork u v )
+
 

@@ -115,7 +115,6 @@ The following shows two trees with the same fringe but different costs:
                                              3     6            
 -}
 
-
 tree_3 :: Tree
 tree_3 = Fork 
             (Fork 
@@ -330,4 +329,59 @@ Also remember that the values of the integers in each node represent the height 
 find the overall minimum height, using the height of each node as the cost of each node.
 
 Code in chap07d.hs.
+
+Optimisations
+-------------
+
+```haskell
+mincostTree :: [Int] -> Tree
+mincostTree = foldl1 Fork . map snd . foldrn insert (wrap . leaf)
+
+insert :: Int -> [(Int, Tree)] -> [(Int, Tree)]
+insert x ts = leaf x : split x ts
+
+split :: Int -> [(Int, Tree)] -> [(Int, Tree)]
+split x [u] = [u]
+split x (u : v : ts) = if x `max` fst u < fst v then u : v : ts
+                       else split x (fork u v : ts)
+
+leaf :: Int -> (Int, Tree)
+leaf x = (x , Leaf x )
+
+fork :: (Int, Tree) -> (Int, Tree) -> (Int, Tree)
+fork (a, u) (b, v) = (1 + a `max` b, Fork u v )
+```
+
+We can test this in ghci:
+
+```haskell
+ghci> :l chap07e.hs
+ghci> mincostTree [1, 2, 3, 4, 5, 6]
+Fork 
+    (Fork 
+        (Fork 
+            (Fork 
+                (Fork 
+                    (Leaf 1) 
+                    (Leaf 2)) 
+                (Leaf 3)) 
+            (Leaf 4)) 
+        (Leaf 5)) 
+    (Leaf 6)
+ghci> mincostTree [1, 2, 3, 6, 5, 4]
+Fork 
+    (Fork 
+        (Fork 
+            (Leaf 1) 
+            (Leaf 2)) 
+        (Leaf 3)) 
+    (Fork 
+        (Leaf 6) 
+        (Fork 
+            (Leaf 5) 
+            (Leaf 4)))
+```
+
+Code in chap07e.hs.
+
 
