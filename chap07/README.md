@@ -92,6 +92,30 @@ ghci> cost tree_2
 The following shows two trees with the same fringe but different costs:
 
 ```haskell
+
+{-
+             tree_3                            tree_4         
+                X                                 X
+               /\                                /\
+              /  \                              /  \
+             /    \                            /    \
+            /      \                          /      \
+           X        X                        X        4
+          /\       / \                      /\      
+         /  \     /   \                    /  \    
+        X    3   6     X                  X    5  
+       / \            / \                / \     
+      /   \          /   \              /   \         
+     1     2        5     4            1     X        
+                                            / \                  
+                                           /   \                
+                                          2     X               
+                                               / \              
+                                              /   \             
+                                             3     6            
+-}
+
+
 tree_3 :: Tree
 tree_3 = Fork 
             (Fork 
