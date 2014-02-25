@@ -205,7 +205,61 @@ Fork
             (Leaf 4))
         (Leaf 5)) 
     (Leaf 6)
+
+ghci> minBy cost $ trees [6, 5, 4, 3, 2, 1]
+Fork 
+    (Leaf 6) 
+    (Fork 
+        (Leaf 5) 
+        (Fork 
+            (Leaf 4) 
+            (Fork 
+                (Leaf 3) 
+                (Fork 
+                    (Leaf 2) 
+                    (Leaf 1)))))
 ```
+
+These look different, but they're actually the same tree, just mirror-imaged.
+However, the following is different:
+
+```haskell
+ghci> minBy cost $ trees [1, 2, 3, 6, 5, 4]
+Fork 
+    (Fork 
+        (Fork 
+            (Fork 
+                (Leaf 1) 
+                (Leaf 2)) 
+            (Leaf 3)) 
+        (Leaf 6)) 
+    (Fork (Leaf 5) (Leaf 4))
+```
+
+The costs are different too:
+
+```haskell
+ghci> fmap cost $ trees [1, 2, 3, 4, 5, 6]
+[7,8,8,8,8,8,9,9,9,8,9,9,8,9,8,8,9,9,9,10,10,9,10,8,8,9,9,10,8,8,8,9,8,8,9,9,10,9,9,10,10,11]
+
+ghci> fmap cost $ trees [1, 2, 3, 4, 5, 6]
+[9,9,10,10,10,10,11,11,11,10,11,11,10,11,9,9,10,10,10,11,11,10,11,9,9,10,10,11,8,8,9,9,9,10,10,9,10,8,8,9,9,10]
+```
+
+Also for the 2nd example there are 4 trees that have minimum cost:
+
+```haskell
+ghci> fmap snd $ filter ((== 8) . fst) [(cost t, t) | t <- trees [1, 2, 3, 6, 5, 4]]
+[
+ Fork (Fork (Fork (Fork (Leaf 1) (Leaf 2)) (Leaf 3)) (Leaf 6)) (Fork (Leaf 5) (Leaf 4)),
+ Fork (Fork (Fork (Leaf 1) (Fork (Leaf 2) (Leaf 3))) (Leaf 6)) (Fork (Leaf 5) (Leaf 4)),
+ Fork (Fork (Fork (Leaf 1) (Leaf 2)) (Leaf 3)) (Fork (Leaf 6) (Fork (Leaf 5) (Leaf 4))),
+ Fork (Fork (Leaf 1) (Fork (Leaf 2) (Leaf 3))) (Fork (Leaf 6) (Fork (Leaf 5) (Leaf 4)))
+]
+```
+
+Also remember that the values of the integers in each node represent the height of a tree at that node. We're trying to 
+find the overall minimum height, using the height of each node as the cost of each node.
 
 Code in chap07d.hs.
 
