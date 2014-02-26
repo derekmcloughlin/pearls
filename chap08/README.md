@@ -27,7 +27,7 @@ up [x] = True
 up (x:y:xs) = x <= y && up (y:xs)
 ```
 
-With this we have `upravels`. This isn't in the book but makes it easier to debug:
+With this we have `upravels`. 
 
 ```haskell
 upravels :: Ord a => [a] -> [[[a]]]
@@ -58,4 +58,22 @@ ghci> supravel "bart"
 
 Code in chap08a.hs.
 
+
+
+Derivation
+----------
+
+An alternative version of `upravels` using foldr is as follows:
+
+```haskell
+upravels :: Ord a => [a] -> [[[a]]]
+upravels = foldr (concatMap . uprefixes) [[]]
+
+uprefixes x [] = [[[x]]]
+uprefixes x (xs : xss) = if x <= head xs then
+                            [(x : xs) : xss] ++ map (xs :) (uprefixes x xss)
+                         else map (xs :) (uprefixes x xss)
+```
+
+Code in chap08b.hs.
 
