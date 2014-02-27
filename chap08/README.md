@@ -77,3 +77,29 @@ uprefixes x (xs : xss) = if x <= head xs then
 
 Code in chap08b.hs.
 
+Using an Insert Function
+------------------------
+
+Similar to what was done in Chapter 7, if we define the function `insert` as follows:
+
+```haskell
+insert :: Ord a => a -> [[a]] -> [[a]]
+insert x [] = [[x]]
+insert x (xs : xss) = if x <= head xs 
+                      then (x : xs) : xss
+                      else xs : insert x xss
+```                      
+
+We can then define:
+
+```haskell
+supravel = foldr insert [] 
+
+ghci> supravel "bart"
+["art","b"]
+```
+
+Code in chap08c.hs.
+
+
+
