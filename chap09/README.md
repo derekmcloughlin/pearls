@@ -250,3 +250,42 @@ If we replace `cclique` with `find_clique`:
 
 Over 34 million calls.
 
+
+More Improvements
+-----------------
+
+The final improvment makes the algorithm linear-time:
+
+```haskell
+cclique' :: Party -> [Person]
+cclique' = foldr op []
+op p cs 
+    | null cs           = [p]
+    | not (p `knows` c) = [p]
+    | not (c `knows` p) = cs
+    | otherwise         = p:cs
+    where c = head cs
+```
+
+This reduces the number of calls further:
+
+```
+   knows           Main                     92          47    0.0    0.0     0.0    0.0
+```
+
+Trying this on a larger file of 200 boys and girls names, and using a larger clique 
+of names beginning with 'S' we have:
+
+Algorithm | Party Size | Clique Size | #calls
+--------- | ---------- | ----------- | ------
+cclique   | 100        | 7           | 1723
+cclique'  | 100        | 7           | 194
+cclique   | 200        | 14          | 6169
+cclique'  | 200        | 14          | 394    
+
+Note: if you try any of these with the original exponential algorithm you 
+might be waiting a while. Even with a set of 50 and clique of 4 it takes
+up a lot of memory, CPU and time.
+
+
+
