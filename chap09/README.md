@@ -177,4 +177,35 @@ ghci> cclique party
 
 The code is in chap09c.hs.
 
+Profiling the Results
+---------------------
+
+Let's profile the two solutions and look for the number of calls to `knows`:
+
+```
+ghc -O2 -prof -auto-all chap09c.hs
+ghc -O2 -prof -auto-all chap09b.hs
+./chap09b +RTS -p
+./chap09c +RTS -p
+```
+
+
+Naive solution:
+
+```
+COST CENTRE                    MODULE                  no.     entries  %time %alloc   %time %alloc
+chap09b.prof:  knows           Main                    102           0    0.0    0.6     0.0    0.6
+chap09b.prof:     knows        Main                     93         559    0.0    0.0     0.0    0.0
+```
+
+Improved solution:
+
+```
+chap09c.prof:  knows           Main                    103           0    0.0    0.3     0.0    0.3
+chap09c.prof:      knows       Main                    101          26    0.0    0.0     0.0    0.0
+chap09c.prof:      knows       Main                     94          36    0.0    0.0     0.0    0.0
+```
+
+559 calls vs 62 calls is quite a difference.
+
 

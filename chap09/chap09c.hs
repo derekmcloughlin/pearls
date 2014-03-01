@@ -67,3 +67,4 @@ ccliques (p : ps) = map (p:) (filter (member p ps) css) ++
                     filter (nonmember p) css 
                     where css = ccliques ps
 
+main = putStrLn $ show $ cclique party

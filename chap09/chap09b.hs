@@ -48,3 +48,4 @@ find_clique :: Party -> [Person]
 find_clique p = head [cs | (cs, ps) <- splitIntoTwo p, is_clique (cs, ps) == True]
 
 
+main = putStrLn $ show $ find_clique party
