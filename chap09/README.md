@@ -206,6 +206,47 @@ chap09c.prof:      knows       Main                    101          26    0.0   
 chap09c.prof:      knows       Main                     94          36    0.0    0.0     0.0    0.0
 ```
 
-559 calls vs 62 calls is quite a difference.
+559 calls vs 62 calls is quite a difference. Remember there are only 8 people at the party.
 
+Let's test it with a larger party. The file `names.txt` contains the top 25 boys 
+names in Ireland in 2012.
+
+Let's write a program that reads this list in and constructs a clique for whoever has a name
+beginning with the letter 'M'. That's a clique of size 2 in a party of 25.
+
+First, a function that returns a `Person` or `Celebrity` depending on the first letter of
+their name.
+
+```haskell
+make_person :: Char -> String -> Person
+make_person c s = 
+    | head s == c   = Celebrity s
+    | otherwise     = Person s
+
+main = do
+    handle <- openFile "names.txt" ReadMode
+    contents <- hGetContents handle
+    let irish_party = map (make_person 'M') $ lines contents
+    putStrLn $ show $ cclique irish_party
+```
+
+Code in chap09d.hs. Running and profiling:
+
+```
+ghc -O2 -prof -auto-all chap09d.hs
+./chap09d +RTS -p
+
+     knows         Main                     99          65    0.0    0.0     0.0    0.0
+     knows         Main                     94         106    0.0    0.0     0.0    0.0
+```
+
+171 calls.
+
+If we replace `cclique` with `find_clique`:
+
+```
+    knows           Main                     94    34062376   33.2    0.0    33.2    0.0
+```
+
+Over 34 million calls.
 
