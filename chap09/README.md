@@ -76,7 +76,8 @@ gives us what we need.
 
 **NOTE: I have absolutely no idea if this is guaranteed. Is there a better way?**
 
-Also note that the function `subseqs` on page 57 also exhibits this behaviour.
+Also note that the function `subseqs` on page 57 also exhibits this behaviour. I prefer to 
+use a standard Haskell function if I can.
 
 ```haskell
 ghci> subsequences "abcd"
@@ -113,4 +114,67 @@ ghci> find_clique party
 ```
 
 Code is in chap09b.hs.
+
+Anne's Improvement
+------------------
+
+Anne defines two functions: `member` and `nonmember` and uses these
+with filters.
+
+The code given in the book uses mathematical symbols, so:
+
+```haskell
+nonmember p cs = and [p knows c ∧ not (c knows p) | c ← cs]
+```
+
+becomes (replacing `∧` with `&&`):
+
+```haskell
+nonmember :: Person -> [Person] -> Bool
+nonmember p cs = and [p `knows` c && not (c `knows` p) | c <- cs]
+```
+
+The `member` function is a bit messier. The use of `⇔ ` means 'if and only if'. 
+
+```haskell
+member p ps cs = and [x knows p ∧ (p knows x ⇔ x ∈ cs) | x ← ps]
+```
+
+"If and only if" is described [here](http://en.wikipedia.org/wiki/Iff). We define
+a function `iff` as follows:
+
+```haskell
+iff :: Bool -> Bool -> Bool
+iff a b = (not a || b) && (not b || a)
+```
+
+Thus the definition of member is:
+
+
+```haskell
+member :: Person -> [Person] -> [Person] -> Bool
+member p ps cs = and [x `knows` p && iff (p `knows` x) (x `elem` cs) | x <- ps]
+```
+
+This makes the definition of `cliques` as follows:
+
+```haskell
+cclique :: Party -> [Person]
+cclique = head . ccliques
+
+ccliques [] = [[]]
+ccliques (p : ps) = map (p:) (filter (member p ps) css) ++ 
+                    filter (nonmember p) css 
+                    where css = ccliques ps
+```
+
+Let's test it out:
+
+```haskell
+ghci> cclique party
+[Celebrity "Cameron Diaz",Celebrity "Matt Damon",Celebrity "Tom Cruise"]
+```
+
+The code is in chap09c.hs.
+
 
