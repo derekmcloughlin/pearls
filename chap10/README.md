@@ -31,4 +31,16 @@ ghci> nub' "calculus"
 "aclus"
 ```
 
+To make it easier to profile the code with different strings, let's include a main method:
+
+```haskell
+main = do
+    args <- getArgs
+    let word = case args of
+                    [] -> "calculus"
+                    (x:_) -> x
+    putStrLn $ show $ nub' word
+```
+
 Code in chap10a.hs.
+
