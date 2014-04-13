@@ -262,7 +262,7 @@ ghci> checklist a
 array (0,20) [(0,True),(1,True),(2,True),(3,True),(4,True),(5,True),(6,True),
               (7,True),(8,True),(9,True),(10,True),(11,True),(12,True),(13,True),
               (14,True),(15,False),(16,False),(17,True),(18,False),(19,True),(20,False)]
-```haskell
+```
 
 The first False entry is what we want. We see visually that it's 15.
 
