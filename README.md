@@ -9,7 +9,7 @@ Bird's [Pearls of Functional Algorithm Design](http://www.amazon.com/Pearls-Func
 All the examples are working Haskell programs. For each I've included 
 some short notes of my own on any issues in getting them to work.
 
-* [The smallest free number](https://github.com/derekmcloughlin/pearls/tree/master/chap01)
+* [The Smallest Free Number](https://github.com/derekmcloughlin/pearls/tree/master/chap01)
 * [A Surpassing Problem](https://github.com/derekmcloughlin/pearls/tree/master/chap02)
 * [Improving on Saddleback Search](https://github.com/derekmcloughlin/pearls/tree/master/chap03)
 * [A Selection Problem](https://github.com/derekmcloughlin/pearls/tree/master/chap04)
