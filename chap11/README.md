@@ -136,3 +136,50 @@ The state diagram looks like this:
 
 ![](https://github.com/derekmcloughlin/pearls/blob/master/chap11/state-machine.png)
 
+The states can be described using a Haskell data type, and the transitions can be 
+encoded using the `step` function:
+
+```haskell
+data State = E | S | M | N
+    deriving(Eq, Show)
+
+step :: State -> Bool -> State
+step E False = E 
+step E True = S 
+step S False = M 
+step S True = S 
+step M False = M
+step M True = N
+step N False = N
+step N True = N
+```
+
+To apply these transitions to a sequence with markings, e.g. FFTTTFTF, we use a fold:
+
+```haskell
+nonseg :: [(a, Bool)] -> Bool
+nonseg = (== N) . foldl step E . map snd
+```
+
+This will start with applying `step E` to 'False', yielding state 'E' again.
+When it reaches the first 'True', then the `step E` gives the state 'S'.
+When it goes through the next 'True's, the state stays at 'S'.
+The next 'False' moves the state to 'M'.
+The next 'True' moves the state to 'N'.
+After that we don't care - any True or False keeps the state at 'N'.
+
+We finally have the code to find the maximum sum of a non-segment:
+
+
+```haskell
+mnss :: [Int] -> Int
+mnss = maximum . map sum . nonsegs
+```
+
+Code is in chap11a.hs.
+
+
+
+
+
+

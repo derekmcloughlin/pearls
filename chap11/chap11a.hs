@@ -25,9 +25,10 @@ nonseg = (== N) . foldl step E . map snd
 step :: State -> Bool -> State
 step E False = E 
 step E True = S 
-step M False = M
-step M True = N
 step S False = M 
 step S True = S 
+step M False = M
+step M True = N
 step N False = N
 step N True = N
+
