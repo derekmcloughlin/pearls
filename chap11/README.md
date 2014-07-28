@@ -172,6 +172,12 @@ We finally have the code to find the maximum sum of a non-segment:
 
 
 ```haskell
+nonsegs :: [a] -> [[a]]
+nonsegs = extract . filter nonseg . markings
+
+extract :: [[(a, Bool)]] -> [[a]]
+extract = map (map fst . filter snd)
+
 mnss :: [Int] -> Int
 mnss = maximum . map sum . nonsegs
 ```
