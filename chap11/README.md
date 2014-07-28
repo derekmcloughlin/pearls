@@ -134,5 +134,5 @@ sequence of T's and F's gets to this state, then we know it's a non-segment.
 
 The state diagram looks like this:
 
-![](state-diagram.svg)
+![](state-diagram.svg?raw=true)
 
