@@ -134,5 +134,5 @@ sequence of T's and F's gets to this state, then we know it's a non-segment.
 
 The state diagram looks like this:
 
-![](https://github.com/derekmcloughlin/pearls/blob/master/chap11/state-diagram.svg)
+![](https://github.com/derekmcloughlin/pearls/blob/master/chap11/state-machine.png)
 
