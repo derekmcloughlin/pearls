@@ -22,6 +22,7 @@ To find the list of non-segments of a list we first construct
 a list of all possible combinations
 
 ```haskell
+booleans :: Int -> [[Bool]]
 markings :: [a] -> [[(a, Bool)]]
 markings xs = [zip xs bs | bs <- booleans (length xs)]
 
@@ -184,8 +185,38 @@ mnss = maximum . map sum . nonsegs
 
 Code is in chap11a.hs.
 
+Final Code
+----------
 
+After a lot of derivation, we arrive at the final code:
 
+```haskell
+mnss :: [Int] -> Int
+mnss xs = fourth (foldl h (start (take 3 xs)) (drop 3 xs))
+
+h :: (Num a,  Ord a) => (a, a, a, a) -> a -> (a, a, a, a)
+h (e, s, m, n) x = (e, max s e + x, max m s, max n (max n m + x))
+
+fourth :: (a, b, c, d) -> d
+fourth (_, _, _, x) = x
+
+start :: (Num a,  Ord a) => [a] -> (a, a, a, a)
+start xs = (0, maximum [x + y + z, y + z, z], maximum [x, x + y, y], x + z)
+    where x = xs!!0
+          y = xs!!1
+          z = xs!!2
+```
+
+It doesn't take a very large array to show that this is noticably faster than
+the previous version. The following test data, which has a 
+length of 18, shows the difference:
+
+```haskell
+testDataBig :: [Int]
+testDataBig = [-4, -3, -7, 2, 1, -2, -1, -4, 5, 7, -8, 3, 2, -1, -4, 5, -9, 3]
+```
+
+Code is in chap11b.hs
 
 
 
