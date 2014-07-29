@@ -7,6 +7,7 @@ testData = [-4, -3, -7, 2, 1, -2, -1, -4]
 markings :: [a] -> [[(a, Bool)]]
 markings xs = [zip xs bs | bs <- booleans (length xs)]
 
+booleans :: Int -> [[Bool]]
 booleans 0 = [[]]
 booleans n = [b : bs | b <- [True, False], bs <- booleans (n - 1)]
 
