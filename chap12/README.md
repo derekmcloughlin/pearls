@@ -154,3 +154,56 @@ ghci> ranktails testData
 
 Code in chap12b.hs
 
+A Better Rank
+-------------
+
+Using a partition sort, the `rank` function can be redefined. The `psort` function is:
+
+```haskell
+psort :: Ord b => [(a, b)] -> [[a]]
+psort xys = pass xys []
+
+pass [] xss = xss
+pass (e@(x , y):xys) xss = step xys [] [x] [] xss
+    where
+        step [] as bs cs xss = pass as (bs : pass cs xss)
+        step (e@(x, y'):xys) as bs cs xss 
+            | y' < y    = step xys (e:as) bs cs xss
+            | y' == y   = step xys as (x:bs) cs xss
+            | y' > y    = step xys as bs (e:cs) xss
+```
+
+(Note: there's a typo in the book where "xs" is used instead of "xys"). 
+
+The `psort` function sorts an array of pairs based on the value of the 2nd
+item in the pair.
+
+```haskell
+ghci> psort [(12, 16), (12, 3), (12, 4), (11, 9), (3, 13), (7, 8)]
+[[12],[12],[7],[11],[3],[12]]
+```
+
+The `rank` function can then be redefined as:
+
+
+```haskell
+rank :: Ord a => [a] -> [Int]
+rank = resort . concat . label . psort . zip [0..]
+
+label :: [[a]] -> [[(a, Int)]]
+label xss = zipWith tag xss (scanl (+) 0 (map length xss))
+
+tag :: [a] -> b -> [(a, b)]
+tag xs k = [(x, k) | x <- xs]
+
+resort :: [(Int, Int)] -> [Int]
+resort ijs = elems (array (0, length ijs - 1) ijs)
+```
+
+```haskell
+ghci> ranktails testData
+[3,2,0,4,5,1]
+```
+
+Code in chap12c.hs
+
