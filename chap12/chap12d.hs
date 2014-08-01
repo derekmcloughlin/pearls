@@ -9,32 +9,11 @@ ranking1 = [3, 1, 3, 0, 1]
 ranking2 :: [Int]
 ranking2 = [2, 0, 3, 4, 0]
 
-(<<) :: Ord a => [a] -> [a] -> [Int]
-xs << ys = rank (zip xs ys)
-
 shiftBy :: Int -> [Int] -> [Int]
-shiftBy k rs = map (+k) (drop k rs) ++ [k-1, k-2 .. 0]
-
-ranktails :: Ord a => [a] -> [Int]
-ranktails = applyUntil isperm rerankings . rank
-
-rerankings :: [[Int] -> [Int]]
-rerankings = map rerank (iterate (*2) 1)
-
-rerank :: Int -> [Int] -> [Int]
-rerank k rs = rs << shiftBy k rs
+shiftBy k rs = map (+ k) (drop k rs) ++ [k - 1, k - 2 .. 0]
 
 applyUntil :: (a -> Bool) -> [a -> a] -> a -> a
 applyUntil p (f:fs) x = if p x then x else applyUntil p fs (f x)
-
-isperm :: [Int] -> Bool
-isperm is = and (elems
-            (accumArray (||) False (0, n - 1) (zip is (repeat True))))
-            where n = length is
-
-
-rank :: Ord a => [a] -> [Int]
-rank = resort . concat . label . psort . zip [0..]
 
 psort :: Ord b => [(a, b)] -> [[a]]
 psort xys = pass xys []
@@ -58,4 +37,20 @@ tag xs k = [(x, k) | x <- xs]
 resort :: [(Int, Int)] -> [Int]
 resort ijs = elems (array (0, length ijs - 1) ijs)
 
+partition :: Ord a => [a] -> [[Int]]
+partition = psort . zip [0..]
+
+ranktails :: Ord a => [a] -> [Int]
+ranktails = resort . concat . label . 
+                applyUntil (all single) repartitions . partition
+
+repartitions :: [[[Int]] -> [[Int]]]
+repartitions = map repartition (iterate (* 2) 1)
+
+repartition :: Int -> [[Int]] -> [[Int]]
+repartition k iss = partition(zip rs (shiftBy k rs))
+                    where rs = resort (concat (label iss))
+
+single :: [a] -> Bool
+single xs = length xs == 1
 

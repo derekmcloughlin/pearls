@@ -16,6 +16,7 @@ tails xs = xs : tails (tail xs)
 rank :: Ord a => [a] -> [Int]
 rank xs = map (\x -> length (filter (< x) xs)) xs
 
+-- This function isn't actually used in the algorithm.
 rats :: Ord a => Int -> [a] -> [Int]
 rats k = rank . map (take k) . tails
 
@@ -33,7 +34,6 @@ rerankings = map rerank (iterate (*2) 1)
 
 rerank :: Int -> [Int] -> [Int]
 rerank k rs = rs << shiftBy k rs
-
 
 applyUntil :: (a -> Bool) -> [a -> a] -> a -> a
 applyUntil p (f:fs) x = if p x then x else applyUntil p fs (f x)

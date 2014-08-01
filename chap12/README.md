@@ -113,11 +113,14 @@ ghci> rats 5 testData
 [3,2,0,4,5,1]
 ```
 
+NOTE: `rats` isn't actually used in the algorithm, but just used to prove
+the derivation of a better algorithm.
+
 The function `shiftBy` is used in definining another property of `rats`:
 
 ```haskell
 shiftBy :: Int -> [Int] -> [Int]
-shiftBy k rs = map (+k) (drop k rs) ++ [k-1, k-2 .. 0]
+shiftBy k rs = map (+ k) (drop k rs) ++ [k - 1, k - 2 .. 0]
 ```
 
 Example:
@@ -206,4 +209,69 @@ ghci> ranktails testData
 ```
 
 Code in chap12c.hs
+
+The Final Algorithm
+-------------------
+
+If the function `partition` is defined as:
+
+```haskell
+partition :: Ord a => [a] -> [[Int]]
+partition = psort . zip [0..]
+```
+
+Then as a step towards the final algorithm, we have:
+
+```haskell
+ranktails :: Ord a => [a] -> [Int]
+ranktails = resort . concat . label . 
+                applyUntil (all single) repartitions . partition
+
+repartitions :: [[[Int]] -> [[Int]]]
+repartitions = map repartition (iterate (* 2) 1)
+
+repartition :: Int -> [[Int]] -> [[Int]]
+repartition k iss = partition(zip rs (shiftBy k rs))
+                    where rs = resort (concat (label iss))
+
+single :: [a] -> Bool
+single xs = length xs == 1
+```
+
+It still works:
+
+```haskell
+ghci> ranktails testData
+[3,2,0,4,5,1]
+```
+
+Code in chap12d.hs.
+
+The final algorithm is as follows:
+
+
+```haskell
+ranktails :: Ord a => [a] -> [Int]
+ranktails xs = (resort n . concat . label .
+               applyUntil (all single) (repartitions n) ·
+               psort · zip [0..]) xs
+               where n = length xs
+
+resort n = elems · array (0, n−1)
+
+label iss = zipWith tag iss (scanl (+) 0 (map length iss))
+
+tag is j = [(i, j ) | i ←is]
+
+repartitions n = map (repartition n) (iterate (∗2) 1)
+
+repartition n k iss = concatMap (psort · map install ) iss
+
+where install i = (i, if j < n then k + a ! j else n−i−1)
+
+a = array (0, n−1) (concat (label iss))
+```
+
+Code in chap12e.hs.
+
 
