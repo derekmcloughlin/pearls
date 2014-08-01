@@ -253,23 +253,27 @@ The final algorithm is as follows:
 ```haskell
 ranktails :: Ord a => [a] -> [Int]
 ranktails xs = (resort n . concat . label .
-               applyUntil (all single) (repartitions n) ·
-               psort · zip [0..]) xs
+               applyUntil (all single) (repartitions n) .
+               psort . zip [0..]) xs
                where n = length xs
 
-resort n = elems · array (0, n−1)
+resort :: Int -> [(Int, Int)] -> [Int]
+resort n = elems . array (0, n - 1)
 
+label :: [[a]] -> [[(a, Int)]]
 label iss = zipWith tag iss (scanl (+) 0 (map length iss))
 
-tag is j = [(i, j ) | i ←is]
+tag :: [a] -> b -> [(a, b)]
+tag is j = [(i, j ) | i <- is]
 
-repartitions n = map (repartition n) (iterate (∗2) 1)
+repartitions :: Int -> [[[Int]] -> [[Int]]]
+repartitions n = map (repartition n) (iterate (* 2) 1)
 
-repartition n k iss = concatMap (psort · map install ) iss
-
-where install i = (i, if j < n then k + a ! j else n−i−1)
-
-a = array (0, n−1) (concat (label iss))
+repartition :: Int -> Int -> [[Int]] -> [[Int]]
+repartition n k iss = concatMap (psort . map install ) iss
+                      where install i = (i, if j < n then k + a!j else n - i - 1)
+                                        where j = i + k
+                            a = array (0, n - 1) (concat (label iss))
 ```
 
 Code in chap12e.hs.
