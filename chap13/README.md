@@ -148,4 +148,63 @@ True
 
 Code in chap13b.hs
 
+A Faster Algorithm
+------------------
 
+The search for a faster algorithm starts off with defining a function `apply`
+such that:
+
+```haskell
+sort ys = apply p ys
+```
+
+This gives us (using `sort'` instead of `sort`, and taking out the locally-defined
+versions of `p` and `apply`):
+
+```haskell
+sort' ys = apply q ys
+  where
+    q = p ys
+
+p :: Ord a => [a] -> [Int]
+p ys = map snd (sort (zip ys [0 .. n - 1]))
+  where
+    n = length ys
+
+apply :: [Int] -> [a] -> [a]
+apply p ys = [ys !! (p !! i ) | i <- [0 .. n - 1]]
+  where
+    n = length ys
+```
+
+Here, `p` gives us the indexes of the items in the list
+as they would appear if the list was sorted.
+
+```haskell
+ghci> p "hello"
+[1,0,2,3,4]
+```
+
+`apply` just takes those indexes and iterates through the list to give 
+the sorted version:
+
+```haskell
+ghic> apply [1, 0, 2, 3, 4] "hello"
+"ehllo"
+```
+
+Given this, we arrive at a second version of `recreate`, which we call `recreate'`, and
+a corresponding version of `untransform'`:
+
+```haskell
+recreate' :: Ord a => Int -> [a] -> [[a]]
+recreate' 0 ys = map (const []) ys
+recreate' j ys = (consCol . fork (apply q, apply q . (recreate' (j - 1)))) ys
+  where
+    q = p ys
+
+untransform' :: Ord a => ([a], Int) -> [a]
+untransform' (ys, k) = (recreate' (length ys) ys) !! k
+```
+
+Code in chap13c.hs.
