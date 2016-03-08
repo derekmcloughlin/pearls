@@ -40,3 +40,34 @@ untransform (ys, k) = (recreate (length ys) ys) !! k
 
 t = transform "Now is the time for all good men to come to the aid of their party."
 u = untransform t
+
+sort' ys = apply q ys
+  where
+    q = p ys
+
+p :: Ord a => [a] -> [Int]
+p ys = map snd (sort (zip ys [0 .. n - 1]))
+  where
+    n = length ys
+
+apply :: [Int] -> [a] -> [a]
+apply p xs = [xs !! (p !! i ) | i <- [0 .. n - 1]]
+  where
+    n = length xs
+
+recreate' :: Ord a => Int -> [a] -> [[a]]
+recreate' 0 ys = map (const []) ys
+recreate' j ys = (consCol . fork (apply q, apply q . (recreate' (j - 1)))) ys
+  where
+    q = p ys
+
+untransform' :: Ord a => ([a], Int) -> [a]
+untransform' (ys, k) = (recreate' (length ys) ys) !! k
+
+recreate'' j ys = (transpose . (take j) . tail . iterate (apply q) ) ys
+  where
+    q = p ys
+
+untransform'' :: Ord a => ([a], Int) -> [a]
+untransform'' (ys, k) = (recreate'' (length ys) ys) !! k
+
