@@ -97,3 +97,17 @@ transform' xs = ([xa!(pa!i) | i <- [0 .. n - 1]], k)
     pa = listArray (0, n - 1) ps
     ps = map snd (sort (zip (tails (tag xs))[0 .. n - 1]))
 
+
+main :: IO ()
+main = do
+    args <- getArgs  
+    handle <- openFile (args!!1) ReadMode
+    contents <- hGetContents handle
+    let result = (case args!!0) of
+                    "1" -> untransform
+                    "2" -> untransform'
+                    "3" -> untransform''
+                    "4" -> untransform'''
+                    _   -> undefined) $ transform contents
+    putStrLn $ show $ length result
+

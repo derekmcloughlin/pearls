@@ -249,8 +249,56 @@ untransform'' :: Ord a => ([a], Int) -> [a]
 untransform'' (ys, k) = (recreate'' (length ys) ys) !! k
 ```
 
+### Using Haskell Arrays Instead Of Lists
+
+The final version of `untransform` uses Haskell's Data.Array for
+constant-time access to array elements, instead of the linear-time
+access of lists:
+
+```haskell
+import Data.Array
+
+untransform''' (ys, k) = take n (tail (map (ya!) (iterate (pa!) k)))
+  where 
+    n = length ys
+    ya = listArray (0, n - 1) ys
+    pa = listArray (0, n - 1) (map snd (sort (zip ys [0 .. ])))
+```
+
 Code in chap13d.hs.
 
+## Transform Revisited
+
+The `transform` function can also be optimised further:
+
+```haskell
+transform' xs = ([xa!(pa!i) | i <- [0 .. n - 1]], k)
+  where 
+    n = length xs
+    tag xs = xs ++ ['\0']
+    k = length (takeWhile (/= 0) ps)
+    xa = listArray (0, n - 1) (rrot xs)
+    pa = listArray (0, n - 1) ps
+    ps = map snd (sort (zip (tails (tag xs))[0 .. n - 1]))
+```
+
+Note that because of the use of `'\0'`, the type of the function
+is now restricted to character arrays:
+
+```haskell
+ghci> :t transform'
+transform' :: [Char] -> ([Char], Int)
+```
+
+Code also in chap13d.hs.
+
 ## Let's Take It For A Spin
+
+Let's compare all four implementations of `untransform` on a large string. 
+
+let testString = 
+
+
+Code also in chap13e.hs.
 
 
