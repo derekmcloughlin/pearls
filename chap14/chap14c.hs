@@ -27,6 +27,6 @@ border xs
     x = last xs 
     zs = border ys
 
-borders :: (Show a, Ord a) => [a] -> [[a]]
+borders :: Eq a => [a] -> [[a]]
 borders [] = [[]]
 borders xs = xs : borders (border xs)
