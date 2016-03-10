@@ -167,3 +167,70 @@ ghci> maxtail "introduction"
 ```
 
 Code in chap14c.hs
+
+### Modified Version of "border"
+
+The book shows an "optimised" verison of `border` on page 106:
+
+```haskell
+border :: Ord a => [a] -> [a]
+border xs 
+    | xs == []                   = []
+    | length(xs) == 1            = []
+    | ys_after_zs == []          = []
+    | head(ys_after_zs) < x      = border (zs ++ [x])
+    | head(ys_after_zs) == x     = (zs ++ [x])
+    | head(ys_after_zs) > x      = []   -- Problem with this line?
+  where 
+    ys = init xs 
+    x = last xs 
+    zs = border ys 
+    ys_after_zs = (ys `after` zs) 
+```
+
+However, I couldn't get it to work on the following input:
+
+```haskell
+ghci> border "mammam"
+["mammam","mam","m",""] -- correct
+ghci> borders "bobbob"
+["bobbob","b",""]       -- incorrect
+```
+
+The problem (I think) lies with the line:
+
+```haskell
+    | head(ys_after_zs) > x      = []
+```
+
+, which probably should be:
+
+
+```haskell
+    | head(ys_after_zs) > x      = border (zs ++ [x])
+```
+
+Which means the definition of `border` is:
+
+```haskell
+border :: Ord a => [a] -> [a]
+border xs 
+    | xs == []                   = []
+    | length(xs) == 1            = []
+    | ys_after_zs == []          = []
+    | head(ys_after_zs) < x      = border (zs ++ [x])
+    | head(ys_after_zs) == x     = (zs ++ [x])
+    | head(ys_after_zs) > x      = border (zs ++ [x])
+  where 
+    ys = init xs 
+    x = last xs 
+    zs = border ys 
+    ys_after_zs = (ys `after` zs) 
+```
+
+However, this is exactly the same as the version in chap14c.hs. Am I missing something here?
+
+Code in chap14d.hs if you want to check.
+
+
+
