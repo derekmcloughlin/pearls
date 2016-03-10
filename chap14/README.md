@@ -31,19 +31,64 @@ ghci> maxtail "introduction"
 "uction"
 ```
 
-## Borders and Border
+## Borders
 
-As part of finding a new version of `op`, the function `borders` is introduced. 
-However, we need to define a couple of helper functions first:
+As part of finding a new version of `op`, the function `borders` is 
+introduced. A list `xs` is a border of `ys` if `xs` is both a suffix and 
+a prefix of `ys`.
 
-The operator `after` is defined such that:
+We can define this as follows:
+
+```haskell
+borders xs = [ys | ys <- tails xs, ys `isPrefixOf` xs]
+```
+
+```haskell
+ghci> borders "7412741274"
+["7412741274","741274","74",""]
+ghci> borders "11111111"
+["11111111","1111111","111111","11111","1111","111","11","1",""]
+ghci> borders "mammam"
+["mammam","mam","m",""]
+```
+
+With this definition we can re-define `op` as:
+
+```haskell
+op :: Ord a => [a] -> a -> [a]
+op ys x = maximum [zs ++ [x] | zs <- borders ys]
+```
+
+We can test `maxtail` as before:
+
+```haskell
+ghci> maxtail "tomato"
+"tomato"
+ghci> maxtail "introduction"
+"uction"
+```
+
+Code in chap14b.hs.
+
+### Border
+
+We would like to define `borders` in terms of 
+the function `border`, which gives the maximum border of a list, as follows:
+
+```haskell
+borders :: Eq a => [a] -> [[a]]
+borders [] = [[]]
+borders xs = xs : borders (border xs)
+```
+
+We start by defining the function `after` such that:
 
 ```haskell
 (xs ++ ys) `after` xs = ys
 ```
 
-(Rather than use the Unicode symbol directly in Haskell code, I've
-defined the function 'after').
+> Note: Rather than use the Unicode down-arrow symbol directly in Haskell code, I've
+> defined the function 'after' instead.
 
 An implementation of this is as follows:
 
@@ -86,19 +131,39 @@ ghci> "helloworld" `before` "world"
 > Note: the `before` function won't work properly if the second argument
 > isn't a tail of the first argument.
 
-With this in place, we define the functino `borders` as follows:
+With this in place, we define the function `border` as follows:
 
 ```haskell
-borders :: Ord a => [a] => [[a]]
-borders [] = [[]]
-borders xs = xs : borders (border xs)
-
-border (ys ++ [x]) 
-    | head (ys ? zs) < x    = border (zs ++ [x])
-    | head (ys ? zs) x      = zs ++ [x]
-    | head (ys ? zs) > x    = []
+border :: Eq a => [a] -> [a]
+border xs
+    | xs == []                  = []
+    | length(xs) == 1           = []
+    | head (ys `after` zs) == x = zs ++ [x]
+    | otherwise                 = border (zs ++ [x])
   where 
+    ys = init xs 
+    x = last xs 
     zs = border ys
 ```
 
+Trying it out we have:
 
+```haskell
+ghci> borders "7412741274"
+["7412741274","741274","74",""]
+ghci> borders "11111111"
+["11111111","1111111","111111","11111","1111","111","11","1",""]
+ghci> borders "mammam"
+["mammam","mam","m",""]
+```
+
+And `maxtail` again:
+
+```haskell
+ghci> maxtail "tomato"
+"tomato"
+ghci> maxtail "introduction"
+"uction"
+```
+
+Code in chap14c.hs
