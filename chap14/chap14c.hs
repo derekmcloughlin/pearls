@@ -6,6 +6,14 @@ maxtail = foldl op []
 op :: Ord a => [a] -> a -> [a]
 op ys x = maximum [zs ++ [x] | zs <- borders ys]
 
+-- Borders
+
+borders :: Eq a => [a] -> [[a]]
+borders [] = [[]]
+borders xs = xs : borders (border xs)
+
+-- Border
+
 after :: Eq a => [a] -> [a] -> [a]
 after [] ys = ys
 after xs [] = xs
@@ -27,6 +35,3 @@ border xs
     x = last xs 
     zs = border ys
 
-borders :: Eq a => [a] -> [[a]]
-borders [] = [[]]
-borders xs = xs : borders (border xs)

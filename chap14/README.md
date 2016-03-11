@@ -232,5 +232,72 @@ However, this is exactly the same as the version in chap14c.hs. Am I missing som
 
 Code in chap14d.hs if you want to check.
 
+## Cocktail
+
+We define versions of `maxtail` and `op` that uses `cocktail`:
+
+```haskell
+maxtail' :: Ord a => [a] -> [a]
+maxtail' = uncurry (++) . cocktail'
+
+cocktail' :: Ord a => [a] -> ([a], [a])
+cocktail' = foldl op' ([], [])
+
+op' :: Ord a => ([a], [a]) -> a -> ([a], [a])
+op' (zs, ws) x 
+    | null ws   = ([], [x])
+    | w < x     = cocktail' (zs ++ [x])
+    | w == x    = (zs ++ [x], tail ws ++ [x])
+    | w > x     = ([], zs ++ ws ++ [x])
+  where 
+    w = head ws
+
+```
+
+> Note we call the function cocktail' to keep the naming consistent.
+
+Code in chap14e.hs.
+
+Note that the types of the functions has changed.
+
+## Reducing The Problem Size
+
+```haskell
+maxtail'' :: Ord a => [a] -> [a]
+maxtail'' = uncurry (++) . cocktail''
+
+cocktail'' :: Ord a => [a] -> ([a], [a])
+cocktail'' = foldl op'' ([], [])
+
+op'' (zs, ws) x 
+    | null ws   = ([], [x])
+    | w < x     = cocktail'' (take r zs ++ [x])
+    | w == x    = (zs ++ [x], tail ws ++ [x])
+    | w > x     = ([], zs ++ ws ++ [x])
+  where 
+    w = head ws
+    r = (length zs) `mod` (length ws)
+```
+
+Code in chap14f.hs
+
+## Final Optimisations
+
+```haskell
+maxtail''' :: Ord a => [a] -> [a]
+maxtail''' [] = []
+maxtail''' (x:xs) = step (0, 1, x:xs, x:xs, xs)
+
+step (p, q, ys, ws, []) = ys
+step (p, q, ys, w : ws, x:xs)
+    | w < x     = maxtail''' (drop (q - r) (w:ws))
+    | w == x    = step (p + 1, q, ys, ws, xs)
+    | w > x     = step (0, p + q + 1, ys, ys, xs)
+    where r = p `mod` q
+```
+
+Code in chap14g.hs.
+
+## Testing Performance
 
 

@@ -1,4 +1,7 @@
 import Data.List
+import Debug.Trace
+
+debug = flip trace
 
 maxtail :: Ord a => [a] -> [a]
 maxtail = foldl op []
@@ -38,3 +41,36 @@ border xs
     zs = border ys 
     ys_after_zs = (ys `after` zs) 
 
+-- Cocktail
+
+maxtail' :: Ord a => [a] -> [a]
+maxtail' = uncurry (++) . cocktail'
+
+cocktail' :: Ord a => [a] -> ([a], [a])
+cocktail' = foldl op' ([], [])
+
+op' :: Ord a => ([a], [a]) -> a -> ([a], [a])
+op' (zs, ws) x 
+    | null ws   = ([], [x])
+    | w < x     = cocktail' (zs ++ [x])
+    | w == x    = (zs ++ [x], tail ws ++ [x])
+    | w > x     = ([], zs ++ ws ++ [x])
+  where 
+    w = head ws
+
+-- Reducing the problem size
+
+maxtail'' :: Ord a => [a] -> [a]
+maxtail'' = uncurry (++) . cocktail''
+
+cocktail'' :: Ord a => [a] -> ([a], [a])
+cocktail'' = foldl op'' ([], [])
+
+op'' (zs, ws) x 
+    | null ws   = ([], [x])
+    | w < x     = cocktail'' (take r zs ++ [x])
+    | w == x    = (zs ++ [x], tail ws ++ [x])
+    | w > x     = ([], zs ++ ws ++ [x])
+  where 
+    w = head ws
+    r = (length zs) `mod` (length ws)
