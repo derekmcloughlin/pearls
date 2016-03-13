@@ -98,7 +98,6 @@ transform' xs = ([xa!(pa!i) | i <- [0 .. n - 1]], k)
     ps = map snd (sort (zip (tails (tag xs))[0 .. n - 1]))
 
 
-main :: IO ()
 main = do
     args <- getArgs  
     handle <- openFile (args!!1) ReadMode

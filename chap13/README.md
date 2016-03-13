@@ -330,11 +330,54 @@ Code also in chap13d.hs.
 
 ## Let's Take It For A Spin
 
-Let's compare all four implementations of `untransform` on a large string. 
+Let's compare the first and last implementations of `untransform` on some 
+large strings read in from a file.
 
-let testString = 
+Files `test-1.txt` to `test-4.txt` contain roughly double the number of bytes as the 
+previous file. (The data is from The Ballad of Reading Gaol by Oscar Wilde).
+
+```
+ghc -O2 -prof -auto-all chap13b.hs
+./chap13b +RTS -p test-1.txt
+```
+
+The timings and memory usage are as follows:
+
+```
+total time  =        0.43 secs   (433 ticks @ 1000 us, 1 processor)
+total alloc = 477,709,672 bytes  (excludes profiling overheads)
+
+total time  =        1.95 secs   (1948 ticks @ 1000 us, 1 processor)
+total alloc = 2,078,450,928 bytes  (excludes profiling overheads)
+
+total time  =        9.05 secs   (9049 ticks @ 1000 us, 1 processor)
+total alloc = 9,283,988,216 bytes  (excludes profiling overheads)
+
+total time  =       42.70 secs   (42705 ticks @ 1000 us, 1 processor)
+total alloc = 39,493,625,344 bytes  (excludes profiling overheads)
+```
+
+Interestingly, if you double the size of the input, you quadruple the 
+time taken. Also, the memory usage is through the roof!
+
+For the final version in chap13d.hs:
+
+```
+total time  =        0.04 secs   (45 ticks @ 1000 us, 1 processor)
+total alloc =  34,328,760 bytes  (excludes profiling overheads)
 
 
-Code also in chap13e.hs.
+total time  =        0.23 secs   (233 ticks @ 1000 us, 1 processor)
+total alloc = 135,721,120 bytes  (excludes profiling overheads)
 
+total time  =        0.90 secs   (896 ticks @ 1000 us, 1 processor)
+total alloc = 558,073,984 bytes  (excludes profiling overheads)
+
+total time  =        3.57 secs   (3566 ticks @ 1000 us, 1 processor)
+total alloc = 2,205,051,504 bytes  (excludes profiling overheads)
+```
+
+Performance has improved a lot, as has the memory usage.
+
+However, it still looks like O(n^2).
 

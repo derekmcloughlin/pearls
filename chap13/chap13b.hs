@@ -1,4 +1,5 @@
 import Data.List
+import System.Environment (getArgs)
 
 transform :: Ord a => [a] -> ([a], Int)
 transform xs = (map last xss, position xs xss)
@@ -41,7 +42,8 @@ untransform (ys, k) = (recreate (length ys) ys) !! k
 
 main :: IO ()
 main = do
-    hContents <- readFile "test.txt"
+    args <- getArgs
+    hContents <- readFile (head args)
     let result = untransform $ transform hContents
     putStrLn $ if result == hContents then
         "matched"

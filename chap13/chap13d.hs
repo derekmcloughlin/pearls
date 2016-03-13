@@ -97,3 +97,12 @@ transform' xs = ([xa!(pa!i) | i <- [0 .. n - 1]], k)
     pa = listArray (0, n - 1) ps
     ps = map snd (sort (zip (tails (tag xs))[0 .. n - 1]))
 
+main :: IO ()
+main = do
+    args <- getArgs
+    hContents <- readFile (head args)
+    let result = untransform''' $ transform hContents
+    putStrLn $ if result == hContents then
+        "matched"
+    else
+        "NOT MATCHED"
