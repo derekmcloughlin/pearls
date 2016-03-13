@@ -1,4 +1,4 @@
-# Chapter 13 - The Burrows–Wheeler transform
+# Chapter 13 - The Burrows Wheeler Transform
 
 ## Defining the BWT
 
@@ -15,7 +15,9 @@ position xs xss = length (takeWhile (/= xs) xss)
 rots :: [a] -> [[a]]
 rots xs = take (length xs) (iterate lrot xs)
   where 
-    lrot (x:xs) = xs ++ [x]
+    lrot :: [a] -> [a]
+    lrot [] = []
+    lrot (y:ys) = ys ++ [y]
 ```
 
 Code in chap13a.hs.
@@ -54,6 +56,10 @@ recreate :: Ord a => [a] -> [[a]]
 recreate . map last . sort . rots = sort . rots
 ```
 
+So, given the last column of the sorted rotation matrix produced by `transform`, 
+the `recreate` function can recreate the first j columns of the original sorted 
+rotation matrix. 
+
 Then we can define `untransform` as: 
 
 ```haskell
@@ -61,6 +67,33 @@ untransform (ys, k) = (recreate ys) !! k
 ```
 
 ## Recreational Calculation
+
+The `consCol` function takes a list, and a list of lists, and prepends each element of the
+first list onto each element of the second list.
+
+```haskell
+consCol :: ([a], [[a]]) -> [[a]]
+consCol (xs, xss) = zipWith (:) xs xss
+```
+
+```haskell
+ghci:> consCol ("ABCDEFG", ["hello", "world", "how", "are", "you"])
+["Ahello","Bworld","Chow","Dare","Eyou"]
+```
+
+`hdsort` sorts a matrix based on its first column.
+
+```haskell
+hdsort :: Ord a => [[a]] -> [[a]]
+hdsort = sortBy cmp
+  where 
+    cmp (x:xs) (y:ys) = compare x y
+```
+
+```haskell
+ghci:> hdsort ["hello", "world", "how", "are", "you"]
+["are","hello","how","world","you"]
+```
 
 The `takeCols` function takes the jth column of an n x n matrix, such as the
 one produced by `rots` above:
@@ -75,6 +108,8 @@ We can see it in action:
 ```haskell
 ghci> takeCols 3 $ rots "yokohama"
 ["yok","oko","koh","oha","ham","ama","may","ayo"]
+ghci:> takeCols 3 [[1, 3, 5, 7, 9], [2, 4, 6, 9, 1]]
+[[1,3,5],[2,4,6]]
 ```
 
 The first case for `recreate` is straightforward:
@@ -95,20 +130,17 @@ ghci> recreate 0 "hmooakya"
 
 To get the more generic recursive solution, we define the following functions:
 
+`fork` takes a pair of functions and a function argument and returns a pair
+of results of those functions on that argument:
+
 ```haskell
-rrot :: [a] -> [a]
-rrot xs = [last xs] ++ init xs
-
-hdsort :: Ord a => [[a]] -> [[a]]
-hdsort = sortBy cmp
-  where 
-    cmp (x:xs) (y:ys) = compare x y
-
-consCol :: ([a], [[a]]) -> [[a]]
-consCol (xs, xss) = zipWith (:) xs xss
-
 fork :: (a -> b, a -> c) -> a -> (b, c)
 fork (f, g) x = (f x, g x)
+```
+
+```haskell
+ghci:> fork (id, (+1)) 3
+(3,4)
 ```
 
 With these, the `recreate` function in full becomes:
@@ -272,6 +304,10 @@ Code in chap13d.hs.
 The `transform` function can also be optimised further:
 
 ```haskell
+
+rrot :: [a] -> [a]
+rrot xs = [last xs] ++ init xs
+
 transform' xs = ([xa!(pa!i) | i <- [0 .. n - 1]], k)
   where 
     n = length xs
