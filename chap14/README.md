@@ -298,6 +298,5 @@ step (p, q, ys, w : ws, x:xs)
 
 Code in chap14g.hs.
 
-## Testing Performance
 
 
