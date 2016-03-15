@@ -87,8 +87,9 @@ empty :: Queue a
 elems :: Queue a -> [a]
 ```
 
-We'll use an implementation of Okasaki's queue, taken from 
-a (presentation by Andres Loeh) [https://www.andres-loeh.de/afp-ds-1.pdf].
+We'll use an implementation of 
+(Okasaki's queue)[http://www.westpoint.edu/eecs/SiteAssets/SitePages/Faculty%20Publication%20Documents/Okasaki/jfp95queue.pdf], 
+taken from a (presentation by Andres Loeh)[https://www.andres-loeh.de/afp-ds-1.pdf].
 
 ```haskell
 module Queue
