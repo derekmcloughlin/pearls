@@ -21,3 +21,6 @@ some short notes of my own on any issues in getting them to work.
 * [Chapter 10 - Removing Duplicates](https://github.com/derekmcloughlin/pearls/tree/master/chap10)
 * [Chapter 11 - Maximum Non-Segment Sum](https://github.com/derekmcloughlin/pearls/tree/master/chap11)
 * [Chapter 12 - Ranking Suffixes](https://github.com/derekmcloughlin/pearls/tree/master/chap12)
+* [Chapter 13 - The Burrows Wheeler Transform](https://github.com/derekmcloughlin/pearls/tree/master/chap13)
+* [Chapter 14 - The Last Tail](https://github.com/derekmcloughlin/pearls/tree/master/chap14)
+* [Chapter 15 - All The Common Prefixes](https://github.com/derekmcloughlin/pearls/tree/master/chap15)
