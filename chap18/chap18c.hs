@@ -122,3 +122,31 @@ adjust :: (Num a, Ord a) => (a, a) -> a -> (a, a)
 adjust (r, f ) c
     | r > f - 7 = if c > f then (r + 1, c) else (c, f - 1) 
     | otherwise = if c < r then (c, f - 7) else (r + 7, c)
+
+solved :: Grid -> Bool 
+solved g = snd (head g) == 20
+
+bfsolve :: Grid -> Maybe [Move]
+bfsolve g = bfsearch [] [([], g)]
+
+bfsearch :: [State] -> Frontier -> Maybe [Move] 
+bfsearch qs [] = Nothing
+bfsearch qs (p@(ms, q) : ps)
+    | solved q      = Just ms
+    | q `elem` qs   = bfsearch qs ps
+    | otherwise     = bfsearch (q:qs) (ps ++ succs p)
+
+succs :: Path -> [Path]
+succs (ms, q) = [(ms ++ [m], move q m) | m <- moves q]
+
+bfsolve' :: Grid -> Maybe [Move]
+bfsolve' g = bfsearch' [] [] [([], g)]
+
+bfsearch' :: [State] -> [Frontier] -> Frontier -> Maybe [Move] 
+bfsearch' qs [] [] = Nothing
+bfsearch' qs pss [ ] = bfsearch' qs [] (concat (reverse pss))
+bfsearch' qs pss (p@(ms, q) : ps)
+    | solved q      = Just ms
+    | q `elem` qs   = bfsearch' qs pss ps
+    | otherwise     = bfsearch' (q:qs) (succs p:pss) ps
+

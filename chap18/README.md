@@ -293,7 +293,6 @@ Trying this on our two test grids we get:
 
 ```haskell
 ghci> moves g1
-
 [('@',16),('a',22),('b',16),('h',23),('j',32),('l',39)]
 ghci> moves g2
 [('a',3),('d',32),('d',4),('e',41),('e',37),('f',32),('g',27)]
@@ -309,7 +308,7 @@ move :: Grid -> (Vehicle, Cell) -> Grid
 move g (v, c) = g1 ++ adjust i c:g2
   where 
     (g1, i:g2)  = splitAt v1 g
-    v1          = if v == '@' then 0 else ord v - ord 'a'
+    v1          = if v == '@' then 0 else ord v - ord 'a' + 1
 
 adjust :: (Num a, Ord a) => (a, a) -> a -> (a, a)
 adjust (r, f ) c
@@ -342,4 +341,86 @@ ghci> drawGrid $ move g1 ('@', 16)
 ```
 
 Code in chap18b.hs.
+
+## Solving The Problem 
+
+The grid is solved when the special vehicle reaches position 20 on
+the grid.
+
+```haskell
+solved :: Grid -> Bool 
+solved g = snd (head g) == 20
+```
+
+Some more types are used in the solution:
+
+```haskell
+type State = Grid
+type Path = ([Move], State) 
+type Frontier = [Path]
+```
+
+The initial version of the breadth-first search uses these types
+
+```haskell
+bfsearch :: [State] -> Frontier -> Maybe [Move] 
+bfsearch qs [] = Nothing
+bfsearch qs (p@(ms, q) : ps)
+    | solved q      = Just ms
+    | q `elem` qs   = bfsearch qs ps
+    | otherwise     = bfsearch (q:qs) (ps ++ succs p)
+
+succs :: Path -> [Path]
+succs (ms, q) = [(ms ++ [m], move q m) | m <- moves q]
+```
+
+We can define `bfsolve` based on this:
+
+```haskell
+bfsolve :: Grid -> Maybe [Move]
+bfsolve g = bfsearch [] [([], g)]
+```
+
+>Note: this is different than in the book. I'm using `bsolve` with the original
+>`bfsearch` and using `bsolve'` with the improved `bfsearch'` later.
+
+
+Let's test it on the second of our grids:
+
+```haskell
+ghci> bfsolve g2
+Just [('a',3),('b',1),('c',22),('e',37),('e',36),('f',32),('f',31),('f',30),('d',32),('d',39),('@',18),('@',19),('g',27),('g',34),('g',41),('@',20)]
+ghci>
+```
+
+You can check for yourself that it does solve the grid.
+
+The improved breadth-first search is as follows:
+
+```haskell
+bfsolve' :: Grid -> Maybe [Move]
+bfsolve' g = bfsearch' [] [] [([], g)]
+
+bfsearch' :: [State] -> [Frontier] -> Frontier -> Maybe [Move] 
+bfsearch' qs [] [] = Nothing
+bfsearch' qs pss [ ] = bfsearch' qs [] (concat (reverse pss))
+bfsearch' qs pss (p@(ms, q) : ps)
+    | solved q      = Just ms
+    | q `elem` qs   = bfsearch' qs pss ps
+    | otherwise     = bfsearch' (q:qs) (succs p:pss) ps
+```
+
+Again, testing:
+
+```haskell
+ghci> bfsolve' g2
+Just [('a',3),('b',1),('c',22),('e',37),('e',36),('f',32),('f',31),('f',30),('d',32),('d',39),('@',18),('@',19),('g',27),('g',34),('g',41),('@',20)]
+ghci>
+```
+
+Code in chap18c.hs.
+
+
+
+
 
