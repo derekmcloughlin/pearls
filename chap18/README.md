@@ -71,9 +71,9 @@ g2 = [  (16, 17), -- Special vehicle - i.e. our car.
 
 ## Displaying the Grid
 
-While this Grid representation is more space-efficient than using regular 
-cartesian coordinates, it does make it a bit tricker to display 
-the grid. We want something like this:
+While this grid representation is more space-efficient than using regular 
+cartesian coordinates, it does make it a bit tricker to display. We want 
+something like this:
 
 ```haskell
 ghci> drawGrid g1
@@ -93,8 +93,14 @@ ghci> drawGrid g2
  c . e e e .
 ```
 
+> Note that I'm using characters instead of numbers as the book does.
+
 We can represent this as a string of 36 characters, with "." for an empty
 cell, "@" for the special vehicle, and "a" to "z" for the other vehicles.
+
+> Note: in all of this we're relying on the fact that the vehicles in the
+> grid array don't change position - the special vehicle is always the first
+in the list. A move only changes the cell positions of the vehicle.
 
 Our approach is to populate a grid map for each individual vehicle and
 then superimpose all of them to produce a final grid map that can be
@@ -168,6 +174,9 @@ vehicleNames :: String
 vehicleNames = "@" ++ ['a'..] -- The first vehicle is our special one - we mark it with an @.
 ```
 
+> Note: the book uses vehicle numbers, with the special vehicle being number 0.
+> Personally I find it easier to look at the letters.
+
 Displaying a single vehicle in a map is as follows:
 
 ```haskell
@@ -213,5 +222,124 @@ drawGrid g = putStr $ intersperse ' ' $ "\n" ++ unlines (chunksOf 6 $ showGrid g
 
 Code in chap18a.hs
 
+## Moving Vehicles
 
+Let's start moving vehicles around.
+
+We'll need more types:
+
+```haskell
+type Vehicle = Char
+type Move = (Vehicle, Cell) 
+type State = Grid
+type Path = ([Move], State) 
+type Frontier = [Path]
+```
+
+> Note: I've changed the Vehicle type to be a Char instead of an Int.
+> I find it easier to look at the grid with characters.
+
+The function `occupied` lets us know which cells are filled:
+
+```haskell
+occupied :: Grid -> [Cell]
+occupied = foldr (merge . fillcells) []
+
+fillcells :: (Enum a, Num a, Ord a) => (a, a) -> [a]
+fillcells (r, f) = if r > f - 7 then [r .. f] else [r, r + 7 .. f]
+```
+
+```haskell
+ghci> occupied g1
+[1,2,3,4,5,6,8,9,10,11,12,13,15,17,18,19,20,24,25,26,27,31,33,34,36,37,38,40,41]
+ghci> occupied g2
+[1,2,6,8,11,13,15,16,17,18,20,22,25,29,33,34,36,38,39,40]
+```
+
+The function `freecells` gives us the opposite: the list of blank cells, while
+`allcells` gives us the cell positions for every cell in the grid:
+
+```haskell
+freecells :: Grid -> [Cell] 
+freecells g = allcells \\ occupied g
+
+allcells :: [Cell]
+allcells = [c | c <- [1 .. 41], c `mod` 7 /= 0]
+```
+
+```haskell
+ghci> freecells g1
+[16,22,23,29,30,32,39]
+ghci> freecells g2
+[3,4,5,9,10,12,19,23,24,26,27,30,31,32,37,41]
+ghci> allcells
+[1,2,3,4,5,6,8,9,10,11,12,13,15,16,17,18,19,20,22,23,24,25,26,27,29,30,31,32,33,34,36,37,38,39,40,41]
+```
+
+The list of possible moves for a given grid is given by `moves`, which 
+I've modified ot use characters for the vehicles instead of numbers:
+
+```haskell
+moves :: Grid -> [Move]
+moves g = [(v, c) | (v, i) <- zip ['a' ..] g, c <- adjs i, c `elem` fs]
+  where 
+    fs :: [Cell]
+    fs = freecells g
+    adjs :: (Num a, Ord a) => (a, a) -> [a]
+    adjs (r, f) = if r > f - 7 then [f + 1, r - 1] else [f + 7,r - 7]
+```
+
+Trying this on our two test grids we get:
+
+```haskell
+ghci> moves g1
+
+[('@',16),('a',22),('b',16),('h',23),('j',32),('l',39)]
+ghci> moves g2
+[('a',3),('d',32),('d',4),('e',41),('e',37),('f',32),('g',27)]
+```
+
+There the move is a tuple of vehicle name (character) and unoccupied cell number.
+
+A move changes the state of the grid (again, changed to use characters instead
+of numbers to identify the vehicles):
+
+```haskell
+move :: Grid -> (Vehicle, Cell) -> Grid
+move g (v, c) = g1 ++ adjust i c:g2
+  where 
+    (g1, i:g2)  = splitAt v1 g
+    v1          = if v == '@' then 0 else ord v - ord 'a'
+
+adjust :: (Num a, Ord a) => (a, a) -> a -> (a, a)
+adjust (r, f ) c
+    | r > f - 7 = if c > f then (r + 1, c) else (c, f - 1) 
+    | otherwise = if c < r then (c, f - 7) else (r + 7, c)
+```
+
+We can test this by looking at the effect of the first available move on `g1` - the
+one that moves the special vehicle:
+
+```haskell
+ghci> drawGrid g1
+
+ a b c d e e
+ a b c d f g
+ a . @ @ f g
+ . . h h h g
+ . . i . j j
+ k k i . l l
+
+ghci> drawGrid $ move g1 ('@', 16)
+
+ a b c d e e
+ a b c d f g
+ a @ @ . f g
+ . . h h h g
+ . . i . j j
+ k k i . l l
+
+```
+
+Code in chap18b.hs.
 
