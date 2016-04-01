@@ -421,6 +421,34 @@ ghci>
 Code in chap18c.hs.
 
 
+## Depth-First Searching
 
+Before going on to the `psearch` implementation, the table of results on page 
+145 mentions a `dfsolve` solution. The text gives the difference between 
+the depth-first and breadth-first - by replacing `ps ++ succs p` with `succs p ++ps`:
 
+```haskell
+dfsolve :: Grid -> Maybe [Move]
+dfsolve g = dfsearch [] [([], g)]
+
+dfsearch :: [State] -> Frontier -> Maybe [Move] 
+dfsearch qs [] = Nothing
+dfsearch qs (p@(ms, q) : ps)
+    | solved q      = Just ms
+    | q `elem` qs   = dfsearch qs ps
+    | otherwise     = dfsearch (q:qs) (succs p ++ps)
+```
+
+Testing this on our two grids gives a solution, but it's not the shortest:
+
+```haskell
+ghci> let Just n = dfsolve g1
+ghci> length n
+1228
+ghci> let Just n = dfsolve g2
+ghci> length n
+923
+```
+
+Code in chap18d.hs.
 
