@@ -452,3 +452,65 @@ ghci> length n
 
 Code in chap18d.hs.
 
+## Planning
+
+
+## Testing The Worse Case Scenario
+
+The hardest Rush Hour initial configuration for a 6x6 grid is given
+[On the Symbolic Computation of the Hardest
+Configurations of the RUSH HOUR Game](http://www.ulb.ac.be/di/algo/secollet/papers/crs06.pdf).
+
+The configuration is here, and the solution takes 93 steps:
+
+![hardest.png](hardest.png)
+
+
+Let's test this with the different algorithms.
+
+Firstly, we'll need to define the grid in code:
+
+```haskell
+hardest :: Grid
+hardest = [ (17, 18), -- Special vehicle - i.e. our car.
+        (1, 3), 
+        (4, 11), 
+        (5, 19), 
+        (6, 20), 
+        (8, 15), 
+        (9, 10), 
+        (22, 23), 
+        (24, 31), 
+        (30, 37), 
+        (33, 34), 
+        (38, 39), 
+        (40, 41)]
+```
+
+```haskell
+ghci> drawGrid hardest
+
+ a a a b c d
+ e f f b c d
+ e . @ @ c d
+ g g h . . .
+ . i h . j j
+ . i k k l l
+
+```
+
+We can test that the various solutions actually work:
+
+```haskell
+ghci> let x = bsolve' hardest
+ghci> x
+Just [('@',16),('b',18),('a',4),('b',25),('c',26),('a',5),('d',27),('a',6),('e',1),('@',15),('f',11),('h',17),('j',32),('j',31),('c',33),('f',12),('h',10),('g',24),('h',3),('@',17),('e',15),('e',22),('e',29),('@',15),('e',36),('g',22),('h',17),('a',3),('a',2),('d',6),('h',24),('f',10),('c',12),('c',5),('f',9),('b',11),('f',8),('h',10),('g',24),('e',22),('g',25),('g',26),('g',27),('b',25),('h',24),('f',10),('f',11),('i',23),('j',33),('h',31),('@',17),('e',15),('e',8),('e',1),('j',34),('b',32),('@',18),('i',16),('i',9),('k',37),('b',39),('g',25),('d',27),('k',36),('h',38),('g',24),('c',26),('a',5),('g',23),('b',25),('g',22),('h',24),('i',2),('@',16),('@',15),('b',18),('h',17),('j',32),('d',34),('j',31),('c',33),('j',30),('b',32),('j',29),('h',31),('@',17),('@',18),('l',39),('d',41),('l',38),('c',40),('@',19),('@',20)]
+ghci> length <$> x
+Just 93
+
+ghci> let y = dfsolve hardest
+ghci> length <$> y
+Just 15542
+```
+
+
